@@ -5,21 +5,20 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from typing import Mapping, Optional
+from typing import Mapping
 
 from .alias_index import AliasIndex, load_alias_index
 from .arbitrate import arbitrate_id
 from .catalogue import CatalogueIndex, load_default_catalogues
 from .lanes.alias import run_alias
 from .lanes.barcode import run_barcode
+from .lanes.text import decide_text, retrieve_text
 from .types import MatchResult
 
 
 def _parse_order_date(value: str) -> date:
     value = (value or "").strip()
     if not value:
-        # Missing date: treat as far future so open-ended aliases still apply,
-        # and expired ones (valid_to set) drop out conservatively via empty valid_to only.
         return date(2099, 1, 1)
     return datetime.strptime(value, "%Y-%m-%d").date()
 
@@ -51,8 +50,8 @@ class MatchService:
     """
     Tenant-scoped matcher.
 
-    Slice 0+1: barcode → alias → ID arbitration.
-    No text lane yet: fall-through → review / no_candidate_above_floor.
+    Slice 2: barcode → alias → (text retrieve for soft oppose) → ID arb → text decide.
+    Attr / twin filters still deferred to slice 3.
     """
 
     def __init__(self, catalogue: CatalogueIndex, aliases: AliasIndex) -> None:
@@ -96,15 +95,14 @@ class MatchService:
         if al.stopped:
             return al.result  # type: ignore[return-value]
 
-        # (3) ID arbitration
-        id_result = arbitrate_id(bc.tentative, al.tentative)
-        if id_result is not None:
-            return id_result
+        # Text retrieve once: soft oppose for ID, or full decide if no ID.
+        retrieval = retrieve_text(tenant, line.raw_text, self.catalogue)
 
-        # (4) text lane — stub for slice 0+1
-        return MatchResult(
-            decision="review",
-            reason_code="no_candidate_above_floor",
-            confidence=0.0,
-            candidates=[],
-        )
+        # (3) ID arbitration (+ soft text oppose)
+        if bc.tentative or al.tentative:
+            id_result = arbitrate_id(bc.tentative, al.tentative, retrieval)
+            if id_result is not None:
+                return id_result
+
+        # (4) text lane
+        return decide_text(retrieval)

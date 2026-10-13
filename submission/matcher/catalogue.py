@@ -23,6 +23,7 @@ class CatalogueItem:
     item_code: str
     item_name: str
     brand: str
+    item_group: str
     barcode: str
     disabled: bool
     active: bool
@@ -79,6 +80,7 @@ def load_catalogue(path: Path, tenant: str, index: CatalogueIndex | None = None)
                 item_code=code,
                 item_name=(row.get("item_name") or "").strip(),
                 brand=(row.get("brand") or "").strip(),
+                item_group=(row.get("item_group") or "").strip(),
                 barcode=(row.get("barcode") or "").strip(),
                 disabled=disabled_raw in {"1", "true", "True"},
                 active=active,

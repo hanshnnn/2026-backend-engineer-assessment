@@ -1,24 +1,32 @@
-"""ID arbitration + soft text oppose (stub in slice 0+1)."""
+"""ID arbitration + soft text oppose."""
 
 from __future__ import annotations
 
 from typing import Optional
 
+from .lanes.text import TextRetrieval, strong_unique_text_code
 from .types import Candidate, MatchResult, TentativeHit
 
 
-def soft_text_oppose(tentative: TentativeHit) -> Optional[str]:
+def soft_text_oppose(tentative: TentativeHit, retrieval: TextRetrieval | None) -> Optional[str]:
     """
-    Slice 0+1 stub: always treat text as weak → never oppose.
-
-    Later: return opposing item_code if text has a unique strong candidate ≠ ID.
+    If text has a unique strong candidate ≠ ID → oppose.
+    Weak / refused / agreeing text → no oppose (ID may auto).
     """
-    return None
+    if retrieval is None:
+        return None
+    code = strong_unique_text_code(retrieval)
+    if code is None:
+        return None
+    if code == tentative.item_code:
+        return None
+    return code
 
 
 def arbitrate_id(
     barcode: Optional[TentativeHit],
     alias: Optional[TentativeHit],
+    text_retrieval: TextRetrieval | None = None,
 ) -> Optional[MatchResult]:
     """
     Resolve barcode/alias tentatives.
@@ -37,24 +45,23 @@ def arbitrate_id(
                 confidence=0.0,
                 candidates=cands,
             )
-        # Same code from both — prefer barcode reason, keep alias conf if lower? Use max.
         hit = TentativeHit(
             item_code=barcode.item_code,
             confidence=max(barcode.confidence, alias.confidence),
             reason_code="barcode_hit",
             candidates=barcode.candidates or alias.candidates,
         )
-        return _finalize_id_auto(hit)
+        return _finalize_id_auto(hit, text_retrieval)
 
     single = barcode or alias
     if single is None:
         return None
-    return _finalize_id_auto(single)
+    return _finalize_id_auto(single, text_retrieval)
 
 
-def _finalize_id_auto(hit: TentativeHit) -> MatchResult:
-    opposed = soft_text_oppose(hit)
-    if opposed is not None and opposed != hit.item_code:
+def _finalize_id_auto(hit: TentativeHit, text_retrieval: TextRetrieval | None) -> MatchResult:
+    opposed = soft_text_oppose(hit, text_retrieval)
+    if opposed is not None:
         return MatchResult(
             decision="review",
             reason_code="id_text_conflict",
@@ -69,5 +76,7 @@ def _finalize_id_auto(hit: TentativeHit) -> MatchResult:
         reason_code=hit.reason_code,
         item_code=hit.item_code,
         confidence=hit.confidence,
-        candidates=list(hit.candidates) if hit.candidates else [Candidate(hit.item_code, hit.confidence)],
+        candidates=list(hit.candidates)
+        if hit.candidates
+        else [Candidate(hit.item_code, hit.confidence)],
     )

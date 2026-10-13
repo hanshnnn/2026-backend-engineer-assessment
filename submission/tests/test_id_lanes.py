@@ -27,6 +27,7 @@ def _item(tenant: str, code: str, barcode: str = "", active: bool = True) -> Cat
         item_code=code,
         item_name=code,
         brand="",
+        item_group="",
         barcode=barcode,
         disabled=not active,
         active=active,
@@ -189,7 +190,7 @@ class ServiceIntegrationTests(unittest.TestCase):
         self.assertEqual(result.decision, "review")
         self.assertEqual(result.reason_code, "ambiguous_barcode")
 
-    def test_text_stub_fallthrough(self) -> None:
+    def test_cadbury_via_text_lane(self) -> None:
         line = OrderLine(
             line_id="ACM-T-0013",
             tenant="acme",
@@ -198,8 +199,8 @@ class ServiceIntegrationTests(unittest.TestCase):
             raw_text="Cadbury Dairy Milk 165g",
         )
         result = self.svc.match(line)
-        self.assertEqual(result.decision, "review")
-        self.assertEqual(result.reason_code, "no_candidate_above_floor")
+        self.assertEqual(result.decision, "reject")
+        self.assertEqual(result.reason_code, "brand_not_in_tenant")
 
 
 if __name__ == "__main__":

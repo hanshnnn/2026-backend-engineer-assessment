@@ -179,6 +179,7 @@ Use when building / editing DESIGN later:
 | DESIGN scaffold           | `submission/` + stubs                                                       |
 | Assessor pass §1–§2       | Precision bias; admit non-item residual risk; clarify cold start            |
 | 2026-10-13 slice 0+1      | Matcher scaffold + barcode/alias/ID arb under `submission/matcher/`         |
+| 2026-10-13 slice 2        | Text normalize + brand/family + RapidFuzz; soft oppose live                 |
 
 
 ---
@@ -187,12 +188,12 @@ Use when building / editing DESIGN later:
 
 ## While building — checklist
 
-- [x] Implement lanes in the locked order *(ID lanes done; text still stubbed)*
-- [x] Every terminal path has a stable `reason_code` *(for paths that exist in 0+1)*
+- [x] Implement lanes in the locked order *(attrs/twins still slice 3)*
+- [x] Every terminal path has a stable `reason_code` *(for paths that exist)*
 - [x] Tenant filter on every catalogue/alias lookup
 - [ ] Train harness: precision on auto, coverage, net value, curve *(smoke only so far)*
 - [ ] After first train numbers: update `DECISIONS.md` evidence; adjust 0.72 if needed
-- [x] Hand-check Cadbury, Stallion flap, one OLD-alias line, one duplicate-SKU case *(Cadbury → stub fallthrough; barcode/alias unit + train smoke; ambiguous barcode covered)*
+- [x] Hand-check Cadbury, Stallion flap, one OLD-alias line, one duplicate-SKU case
 - [x] Keep this file updated when a lock changes (date + why)
 
 ---
@@ -229,6 +230,48 @@ Use when building / editing DESIGN later:
 **Known gap carried forward:** soft oppose not real yet; alias low-trust hard-stops even if barcode already tentative (per DESIGN — revisit if EVAL shows barcode was right).
 
 **Next:** slice 2 — normalize + brand filter + RapidFuzz retrieve.
+
+### 2026-10-13 — Slice 2 (text lane)
+
+**Shipped:**
+
+- `normalize.py` — lower/slash cleanup, tiny synonyms (`Vermmont`, `ZP`, `S/S`, `skru`/`ayam`/`susu`), class-glue fix
+- `lanes/text.py` — brand detect (+ multi-word), foreign-brand / non-item refuse, family leaf narrow, RapidFuzz `WRatio`, decide with floor/margin
+- soft oppose now uses text retrieve (`id_text_conflict` fired once on train)
+- `requirements.txt` — `rapidfuzz`
+
+**Thresholds (v1, pre-attrs):** `AUTO_FLOOR=0.90`, `MARGIN=0.04`, `REVIEW_FLOOR=0.72`
+
+**Train smoke:**
+
+
+|                   |                                                |
+| ----------------- | ---------------------------------------------- |
+| auto              | 129 (104 lexical + 11 barcode + 14 alias)      |
+| auto wrong        | **4** (all blank-GT / twin-ish)                |
+| precision on auto | **0.969**                                      |
+| coverage          | **~30.7%**                                     |
+| reject            | 67 (`brand_not_in_tenant` 63, `not_an_item` 4) |
+| review heavy      | 198 `ambiguous_margin`                         |
+| net value         | −12340                                         |
+
+
+**4 FPs (all blank gt — slice 3 fodder):**
+
+
+| **line_id**    | **Line text**                  | **Matcher auto’d**                             | **Correct**                                                                    |
+| -------------- | ------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------ |
+| **ACM-T-0028** | Stallion Ball Valve 1-1/4" PVC | `ACM-BALL0667` (exact name hit, score 1.0)     | **blank → abstain**May be a label-edge case                                   |
+| **ACM-T-0066** | Tolsen Bolt M8x50              | `ACM-HEXB0675` (Tolsen Hex Bolt M8x50 **HDG**) | **blank → abstain** (finish not specified; several M8x50 finishes exist)       |
+| **ACM-T-0134** | Tolsen Hex Bolt M8x50 HDG      | `ACM-HEXB0675` (non-bulk)                      | **blank → abstain** (likely because **Bulk twin** `ACM-HEXB0675B` also exists) |
+| **NRD-T-0052** | Halberg Breast Strips 5kg      | `NRD-CHIC0167` (5kg non-bulk)                  | **blank → abstain** (Bulk twin `NRD-CHIC0167B` exists)                         |
+
+
+**Hand checks:** Cadbury → `reject/brand_not_in_tenant`; Stallion flap → no auto; easy Tolsen wall plug → `lexical_unique` correct.
+
+**Tests:** 21 green.
+
+**Next:** slice 3 — attr extract + twin / bulk filter + retune τ/margin.
 
 ---
 

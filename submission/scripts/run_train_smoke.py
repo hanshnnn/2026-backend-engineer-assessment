@@ -55,7 +55,7 @@ def main() -> None:
     print(f"reasons={dict(reasons)}")
     print(f"auto_correct={auto_correct} auto_wrong={auto_wrong} abstain={abstain}")
     print(f"precision_on_auto={precision:.4f} coverage={coverage:.4f} net_value={net}")
-    print("note: text lane is stubbed — most lines abstain with no_candidate_above_floor")
+    print("note: slice 2 text lane on; attr/twin filters still pending (slice 3)")
 
 
 if __name__ == "__main__":
