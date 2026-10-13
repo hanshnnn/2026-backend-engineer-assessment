@@ -178,6 +178,7 @@ Use when building / editing DESIGN later:
 | Twins                     | Required-attr abstain; ignore xN for identity v1                            |
 | DESIGN scaffold           | `submission/` + stubs                                                       |
 | Assessor pass §1–§2       | Precision bias; admit non-item residual risk; clarify cold start            |
+| 2026-10-13 slice 0+1      | Matcher scaffold + barcode/alias/ID arb under `submission/matcher/`         |
 
 
 ---
@@ -186,14 +187,49 @@ Use when building / editing DESIGN later:
 
 ## While building — checklist
 
-- [ ] Implement lanes in the locked order
-- [ ] Every terminal path has a stable `reason_code`
-- [ ] Tenant filter on every catalogue/alias lookup
-- [ ] Train harness: precision on auto, coverage, net value, curve
+- [x] Implement lanes in the locked order *(ID lanes done; text still stubbed)*
+- [x] Every terminal path has a stable `reason_code` *(for paths that exist in 0+1)*
+- [x] Tenant filter on every catalogue/alias lookup
+- [ ] Train harness: precision on auto, coverage, net value, curve *(smoke only so far)*
 - [ ] After first train numbers: update `DECISIONS.md` evidence; adjust 0.72 if needed
-- [ ] Hand-check Cadbury, Stallion flap, one OLD-alias line, one duplicate-SKU case
-- [ ] Keep this file updated when a lock changes (date + why)
+- [x] Hand-check Cadbury, Stallion flap, one OLD-alias line, one duplicate-SKU case *(Cadbury → stub fallthrough; barcode/alias unit + train smoke; ambiguous barcode covered)*
+- [x] Keep this file updated when a lock changes (date + why)
 
 ---
 
-*Last filled from design conversation before matcher build. Append new dated notes below as you go.*
+
+
+## Build notes
+
+
+
+### 2026-10-13 — Slice 0+1 (ID lanes)
+
+**Shipped:** `submission/matcher/` — loaders, barcode, alias (≥0.72 / low-trust stop / OLD fallthrough), ID arb (`id_id_conflict`), soft oppose **stubbed** (never opposes). Text → always `review` / `no_candidate_above_floor`.
+
+**Layout choice:** all code under `submission/`; assessment `data/` + `starter/` stay at repo root.
+
+**Deps:** stdlib only. `rapidfuzz` deferred to text lane.
+
+**Train smoke** (`scripts/run_train_smoke.py`):
+
+
+|                   |                                                                  |
+| ----------------- | ---------------------------------------------------------------- |
+| auto              | 26 (12 `barcode_hit` + 14 `alias_exact`)                         |
+| auto wrong        | 0                                                                |
+| precision on auto | 1.0                                                              |
+| coverage          | ~6.2%                                                            |
+| other             | 9 `alias_low_trust`, 1 `ambiguous_barcode`, 384 stub fallthrough |
+| net value         | −15240 (mostly abstain cost — expected without text)             |
+
+
+**Tests:** 15 unittest cases in `tests/test_id_lanes.py` — all green.
+
+**Known gap carried forward:** soft oppose not real yet; alias low-trust hard-stops even if barcode already tentative (per DESIGN — revisit if EVAL shows barcode was right).
+
+**Next:** slice 2 — normalize + brand filter + RapidFuzz retrieve.
+
+---
+
+*Append new dated notes below as you go.*
