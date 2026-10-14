@@ -182,6 +182,7 @@ Use when building / editing DESIGN later:
 | 2026-10-13 slice 2        | Text normalize + brand/family + RapidFuzz; soft oppose live                 |
 | 2026-10-13/14 slice 3     | Attr extract + twin/bulk filter; precision dipped; blank-GT FP class        |
 | 2026-10-14 blank-GT FPs   | 17 exact-name `auto_wrong`; lean Option D — keep auto, explain in EVAL      |
+| 2026-10-14 brand soft     | Drop denylist/`_PRODUCT_START`; catalogue exact+fuzzy; foreign=weak item   |
 
 
 ---
@@ -309,15 +310,31 @@ Use when building / editing DESIGN later:
 
 **Why wrong autos went 4 → 17:** attr filter removes near-siblings that used to create `ambiguous_margin`. Exact catalogue-name lines with **blank GT** then look unique @ 1.0 → `lexical_unique`. Twin policy worked; side effect unlocked blank-GT exact autos (see next note).
 
-**Honesty / next architecture (not coded yet):** current brand denylist + `_PRODUCT_START` + global attr regexes are **tenant-hardcoded** and won’t travel. Proposed spine (catalogue-derived):
+**Next architecture:** brand step done (below). Still open: catalogue-derived **item phrase** (leaf + brand-stripped name) before attrs; attrs stay last on shortlist.
 
-1. **Brand** vs tenant catalogue brands (exact + fuzzy typos); miss → brandless path, not auto-reject  
-2. **Item phrase** within that pool from `item_group` leaf + brand-stripped `item_name`  
-3. **Attrs last** on the shortlist only (discriminate twins)
+### 2026-10-14 — Brand step (catalogue soft restrict)
 
-Evidence for brandless path: ~28 labelled train lines have no brand token but still have GT (`Cable Tie…`, `GI Wire…`, `PVC 20mm…`). Blank-brand catalogue rows are MISC only.
+**Shipped:** `matcher/brand.py` + rewired `lanes/text.py`
 
-**Paused here** — no further silent threshold tweaks; blank-GT policy locked below as Option D until EVAL.
+- Removed `_FOREIGN_BRAND_TOKENS` denylist and `_PRODUCT_START` allowlist
+- Brand from **tenant catalogue only**: multi-word exact → unigram exact → glued prefix (`HitexNitrile`) → fuzzy typo (`BRAND_FUZZY_FLOOR=78`)
+- **Hit** → soft-restrict pool to that brand; **miss** → full active catalogue (brandless path)
+- Foreign refuse only if leading token looks brand-shaped **and** no tenant brand match **and** top item score &lt; 0.72 → `brand_not_in_tenant` (Cadbury still rejects; Cable Tie does not)
+
+**Train smoke after brand rewrite:**
+
+| | post-attrs (slice 3) | after brand soft |
+|---|---|---|
+| auto correct | 176 | 182 |
+| auto wrong | 17 | 18 |
+| precision | 0.912 | 0.910 |
+| coverage | 46% | 48% |
+| `brand_not_in_tenant` | 63 | **46** |
+| net value | −19160 | −19560 |
+
+Slightly more coverage; foreign rejects fewer (less hardcoded). Blank-GT Option D unchanged. Debug CSV: `submission/debug/train_smoke_*.csv` (fallback if Excel locks `train_smoke.csv`).
+
+**Still hardcoded (next):** global attr regexes; family = substring of `item_group` leaf (OK-ish, catalogue-derived). Item-phrase retrieval not rewritten yet.
 
 ### 2026-10-14 — Blank-GT `auto_wrong` (post-attrs smoke)
 

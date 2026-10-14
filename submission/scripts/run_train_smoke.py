@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import sys
 from collections import Counter
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -16,7 +17,8 @@ from matcher import MatchService  # noqa: E402
 
 DATA = ROOT / "data"
 TRAIN = DATA / "order_lines_train.csv"
-OUT = SUBMISSION / "debug" / "train_smoke.csv"
+OUT_DIR = SUBMISSION / "debug"
+OUT_DEFAULT = OUT_DIR / "train_smoke.csv"
 
 # Relative costs from DESIGN
 V_CORRECT = 20
@@ -42,7 +44,14 @@ def main() -> None:
     auto_correct = auto_wrong = abstain = 0
     n = 0
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out_path = OUT_DEFAULT
+    try:
+        fh_out = out_path.open("w", newline="", encoding="utf-8")
+    except PermissionError:
+        out_path = OUT_DIR / f"train_smoke_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        fh_out = out_path.open("w", newline="", encoding="utf-8")
+
     fieldnames = [
         "line_id",
         "tenant",
@@ -60,9 +69,7 @@ def main() -> None:
         "outcome",
     ]
 
-    with TRAIN.open(newline="", encoding="utf-8") as fh_in, OUT.open(
-        "w", newline="", encoding="utf-8"
-    ) as fh_out:
+    with TRAIN.open(newline="", encoding="utf-8") as fh_in, fh_out:
         writer = csv.DictWriter(fh_out, fieldnames=fieldnames)
         writer.writeheader()
         for row in csv.DictReader(fh_in):
@@ -114,7 +121,7 @@ def main() -> None:
     print(f"outcomes={dict(outcomes)}")
     print(f"auto_correct={auto_correct} auto_wrong={auto_wrong} abstain={abstain}")
     print(f"precision_on_auto={precision:.4f} coverage={coverage:.4f} net_value={net}")
-    print(f"wrote={OUT}")
+    print(f"wrote={out_path}")
 
 
 if __name__ == "__main__":

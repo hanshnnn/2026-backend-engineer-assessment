@@ -1,4 +1,4 @@
-"""Lexical text lane: brand/family → attr filter → twin check → RapidFuzz → decide."""
+"""Lexical text lane: brand (soft) → family → attr filter → twin check → RapidFuzz."""
 
 from __future__ import annotations
 
@@ -13,25 +13,18 @@ from ..attrs import (
     item_matches_query,
     unspecified_attr_disagreement,
 )
+from ..brand import BrandHit, detect_brand, looks_brand_shaped
 from ..catalogue import CatalogueIndex, CatalogueItem
-from ..normalize import normalize_text, tokenize
+from ..normalize import normalize_text
 from ..types import Candidate, MatchResult
 
-# Retuned with attrs (slice 3). Still train-only; may sweep again in EVAL.
 AUTO_FLOOR = 0.90
 MARGIN = 0.03
 REVIEW_FLOOR = 0.72
 SOFT_OPPOSE_FLOOR = 0.90
 FUZZ_LIMIT = 8
-
-_FOREIGN_BRAND_TOKENS = {
-    "cadbury",
-    "nestle",
-    "nestlé",
-    "coca",
-    "pepsi",
-    "heineken",
-}
+# Below this, a brand-shaped leading token that matched no tenant brand → foreign refuse.
+FOREIGN_ITEM_WEAK = 0.72
 
 _NON_ITEM_PHRASES = (
     "same as last",
@@ -42,48 +35,6 @@ _NON_ITEM_PHRASES = (
     "misc charge",
 )
 
-_PRODUCT_START = {
-    "cable",
-    "hose",
-    "pvc",
-    "gi",
-    "ball",
-    "hex",
-    "self",
-    "angle",
-    "wall",
-    "nitrile",
-    "masking",
-    "safety",
-    "grinding",
-    "flap",
-    "screw",
-    "bolt",
-    "valve",
-    "pipe",
-    "wire",
-    "plug",
-    "clip",
-    "glove",
-    "helmet",
-    "tape",
-    "tie",
-    "chicken",
-    "salmon",
-    "beef",
-    "prawn",
-    "potato",
-    "milk",
-    "butter",
-    "puff",
-    "squid",
-    "mozzarella",
-    "vanilla",
-    "whipping",
-    "fries",
-    "patty",
-}
-
 
 @dataclass
 class TextRetrieval:
@@ -93,6 +44,7 @@ class TextRetrieval:
     candidates: list[Candidate]
     refuse_reason: str | None = None
     query_attrs: Attrs | None = None
+    brand_how: str = "none"
 
 
 def _is_misc(item: CatalogueItem) -> bool:
@@ -103,34 +55,6 @@ def _is_misc(item: CatalogueItem) -> bool:
     if any(tok in name for tok in ("DELIVERY FEE", "OPENING BALANCE", "MISC CHARGE", "DO NOT SELL")):
         return True
     return False
-
-
-def _brand_aliases(brands: set[str]) -> dict[str, str]:
-    out: dict[str, str] = {}
-    for b in brands:
-        key = normalize_text(b)
-        if key:
-            out[key] = b
-    typos = {"vermmont": "vermont"}
-    lower_map = {normalize_text(b): b for b in brands}
-    for typo, canon_norm in typos.items():
-        if canon_norm in lower_map:
-            out[typo] = lower_map[canon_norm]
-    return out
-
-
-def _detect_brand(tokens: list[str], brand_map: dict[str, str]) -> str | None:
-    if not tokens:
-        return None
-    multi = sorted((k for k in brand_map if " " in k), key=len, reverse=True)
-    joined = " ".join(tokens)
-    for key in multi:
-        if key in joined:
-            return brand_map[key]
-    for tok in tokens:
-        if tok in brand_map:
-            return brand_map[tok]
-    return None
 
 
 def _family_narrow(text: str, items: list[CatalogueItem]) -> list[CatalogueItem]:
@@ -163,6 +87,24 @@ def _score_candidates(norm: str, pool: list[CatalogueItem]) -> list[Candidate]:
     ]
 
 
+def _maybe_foreign_refuse(
+    hit: BrandHit,
+    cands: list[Candidate],
+) -> str | None:
+    """
+    No hardcoded foreign list: brand-shaped leading token, matched no tenant brand,
+    and item retrieval is weak → brand_not_in_tenant.
+    """
+    if hit.brand is not None:
+        return None
+    if not looks_brand_shaped(hit.leading_token):
+        return None
+    top = cands[0].score if cands else 0.0
+    if top < FOREIGN_ITEM_WEAK:
+        return "brand_not_in_tenant"
+    return None
+
+
 def retrieve_text(tenant: str, raw_text: str, catalogue: CatalogueIndex) -> TextRetrieval:
     norm = normalize_text(raw_text)
     if not norm:
@@ -172,67 +114,85 @@ def retrieve_text(tenant: str, raw_text: str, catalogue: CatalogueIndex) -> Text
         if phrase in norm:
             return TextRetrieval(norm, None, 0, [], refuse_reason="not_an_item")
 
-    tokens = tokenize(norm)
     brands = {it.brand for it in catalogue.items_for_tenant(tenant) if it.brand}
-    brand_map = _brand_aliases(brands)
-    brand = _detect_brand(tokens, brand_map)
+    hit = detect_brand(norm, brands)
     qattrs = extract_attrs(norm)
-
-    if brand is None and tokens:
-        first = tokens[0]
-        if first in _FOREIGN_BRAND_TOKENS:
-            return TextRetrieval(norm, None, 0, [], refuse_reason="brand_not_in_tenant", query_attrs=qattrs)
-        if (
-            first.isalpha()
-            and len(first) >= 4
-            and first not in _PRODUCT_START
-            and first not in brand_map
-        ):
-            return TextRetrieval(norm, None, 0, [], refuse_reason="brand_not_in_tenant", query_attrs=qattrs)
 
     pool = [
         it
         for it in catalogue.items_for_tenant(tenant)
         if it.active and not _is_misc(it)
     ]
-    if brand:
-        branded = [it for it in pool if it.brand == brand]
+    # Soft restrict: brand hit narrows pool; miss keeps full active catalogue.
+    if hit.brand:
+        branded = [it for it in pool if it.brand == hit.brand]
         if branded:
             pool = branded
 
     pool = _family_narrow(norm, pool)
 
-    # Attrs from raw item_name (keeps "(Bulk)" which normalize would strip).
     item_attrs_map = {it.item_code: extract_item_attrs(it.item_name) for it in pool}
-
     filtered = [it for it in pool if item_matches_query(qattrs, item_attrs_map[it.item_code])]
     if not filtered:
+        # Still allow foreign refuse when pool empty after attrs (e.g. Cadbury).
+        foreign = _maybe_foreign_refuse(hit, [])
         return TextRetrieval(
             norm,
-            brand,
+            hit.brand,
             0,
             [],
-            refuse_reason="no_candidate_above_floor",
+            refuse_reason=foreign or "no_candidate_above_floor",
             query_attrs=qattrs,
+            brand_how=hit.how,
         )
 
     pool = filtered
     pool_attrs = [item_attrs_map[it.item_code] for it in pool]
 
-    # Required-attr / bulk twin abstain before trusting fuzz uniqueness.
     if unspecified_attr_disagreement(qattrs, pool_attrs):
         cands = _score_candidates(norm, pool)
+        foreign = _maybe_foreign_refuse(hit, cands)
+        if foreign:
+            return TextRetrieval(
+                norm,
+                hit.brand,
+                len(pool),
+                cands,
+                refuse_reason=foreign,
+                query_attrs=qattrs,
+                brand_how=hit.how,
+            )
         return TextRetrieval(
             norm,
-            brand,
+            hit.brand,
             len(pool),
             cands,
             refuse_reason="ambiguous_twins",
             query_attrs=qattrs,
+            brand_how=hit.how,
         )
 
     cands = _score_candidates(norm, pool)
-    return TextRetrieval(norm, brand, len(pool), cands, query_attrs=qattrs)
+    foreign = _maybe_foreign_refuse(hit, cands)
+    if foreign:
+        return TextRetrieval(
+            norm,
+            hit.brand,
+            len(pool),
+            cands,
+            refuse_reason=foreign,
+            query_attrs=qattrs,
+            brand_how=hit.how,
+        )
+
+    return TextRetrieval(
+        norm,
+        hit.brand,
+        len(pool),
+        cands,
+        query_attrs=qattrs,
+        brand_how=hit.how,
+    )
 
 
 def decide_text(retrieval: TextRetrieval) -> MatchResult:
@@ -287,7 +247,6 @@ def decide_text(retrieval: TextRetrieval) -> MatchResult:
 
 
 def strong_unique_text_code(retrieval: TextRetrieval) -> str | None:
-    """Soft oppose only when text would itself auto (no twin refuse)."""
     if retrieval.refuse_reason:
         return None
     cands = retrieval.candidates
