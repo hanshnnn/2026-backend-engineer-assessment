@@ -36,14 +36,19 @@ class CatalogueIndex:
         self._by_code: dict[tuple[str, str], CatalogueItem] = {}
         # (tenant, barcode) -> active item codes (stable order)
         self._by_barcode: dict[tuple[str, str], list[str]] = {}
+        self._tenants: set[str] = set()
 
     def add(self, item: CatalogueItem) -> None:
         self._by_code[(item.tenant, item.item_code)] = item
+        self._tenants.add(item.tenant)
         if item.active and item.barcode:
             key = (item.tenant, item.barcode)
             bucket = self._by_barcode.setdefault(key, [])
             if item.item_code not in bucket:
                 bucket.append(item.item_code)
+
+    def has_tenant(self, tenant: str) -> bool:
+        return tenant in self._tenants
 
     def get(self, tenant: str, item_code: str) -> CatalogueItem | None:
         return self._by_code.get((tenant, item_code))
@@ -90,7 +95,11 @@ def load_catalogue(path: Path, tenant: str, index: CatalogueIndex | None = None)
 
 
 def load_default_catalogues(data_dir: Path) -> CatalogueIndex:
+    """Load every ``catalogue_<tenant>.csv`` under ``data_dir`` (discovery, not allowlist)."""
     index = CatalogueIndex()
-    load_catalogue(data_dir / "catalogue_acme.csv", "acme", index)
-    load_catalogue(data_dir / "catalogue_nordic.csv", "nordic", index)
+    for path in sorted(data_dir.glob("catalogue_*.csv")):
+        tenant = path.stem.removeprefix("catalogue_")
+        if not tenant:
+            continue
+        load_catalogue(path, tenant, index)
     return index

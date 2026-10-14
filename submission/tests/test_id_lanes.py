@@ -14,7 +14,7 @@ if str(SUBMISSION) not in sys.path:
 
 from matcher.alias_index import AliasIndex, AliasRow  # noqa: E402
 from matcher.arbitrate import arbitrate_id  # noqa: E402
-from matcher.catalogue import CatalogueIndex, CatalogueItem  # noqa: E402
+from matcher.catalogue import CatalogueIndex, CatalogueItem, load_default_catalogues  # noqa: E402
 from matcher.lanes.alias import run_alias  # noqa: E402
 from matcher.lanes.barcode import run_barcode  # noqa: E402
 from matcher.service import MatchService, OrderLine  # noqa: E402
@@ -229,6 +229,39 @@ class ServiceIntegrationTests(unittest.TestCase):
         self.assertEqual(result.decision, "auto")
         self.assertEqual(result.reason_code, "alias_old_successor")
         self.assertEqual(result.item_code, "ACM-ANGL0886")
+
+    def test_catalogue_discovery_not_hardcoded(self) -> None:
+        cat = load_default_catalogues(ROOT / "data")
+        self.assertTrue(cat.has_tenant("acme"))
+        self.assertTrue(cat.has_tenant("nordic"))
+
+    def test_unknown_tenant_rejected(self) -> None:
+        line = OrderLine(
+            line_id="X-1",
+            tenant="ghost",
+            customer_id="CUST-001",
+            order_date="2026-06-01",
+            raw_barcode="910597372782",
+        )
+        result = self.svc.match(line)
+        self.assertEqual(result.decision, "reject")
+        self.assertEqual(result.reason_code, "unknown_tenant")
+
+    def test_cold_start_empty_aliases_barcode_still_works(self) -> None:
+        # Catalogue present, zero alias history — barcode lane must still auto.
+        cat = load_default_catalogues(ROOT / "data")
+        svc = MatchService(cat, AliasIndex())
+        line = OrderLine(
+            line_id="COLD-1",
+            tenant="acme",
+            customer_id="NEW-CUST",
+            order_date="2026-06-01",
+            raw_barcode="910597372782",
+        )
+        result = svc.match(line)
+        self.assertEqual(result.decision, "auto")
+        self.assertEqual(result.reason_code, "barcode_hit")
+        self.assertEqual(result.item_code, "ACM-CABL0816")
 
 
 if __name__ == "__main__":

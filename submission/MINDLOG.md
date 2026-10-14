@@ -182,7 +182,7 @@ Use when building / editing DESIGN later:
 | 2026-10-13 slice 0+1      | Matcher scaffold + barcode/alias/ID arb under `submission/matcher/`         |
 | 2026-10-13 slice 2        | Text normalize + brand/family + RapidFuzz; soft oppose live                 |
 | 2026-10-13/14 slice 3     | Attr extract + twin/bulk filter; precision dipped; blank-GT FP class        |
-| 2026-10-14 blank-GT FPs   | 17 exact-name `auto_wrong`; lean Option D — keep auto, explain in EVAL      |
+| 2026-10-14 blank-GT FPs   | ACME-skewed blank-GT `auto_wrong`; question labels; keep logic; prod plan   |
 | 2026-10-14 brand soft     | Drop denylist/`_PRODUCT_START`; catalogue exact+fuzzy; foreign=weak item   |
 | 2026-10-14 item phrase    | Catalogue leaf + brand-stripped name shortlist before attrs                |
 | 2026-10-14 alias floor    | Drop 0.55/`alias_low_trust` gate — unique alias autos; train-only evidence |
@@ -370,25 +370,22 @@ Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refres
 
 ### 2026-10-14 — Blank-GT `auto_wrong` (post-attrs smoke)
 
-**What:** After attrs/twins, train smoke still has **17** `auto_wrong`. All blank `gt_item_code`, all `lexical_unique` @ 1.0, all exact catalogue `item_name` hits, no buyer_sku/barcode. Families: PVCP 7 / ANGL 4 / SELF 4 / NITR 1 / BALL 1.
+**Observation (train):** Current smoke has **18** `auto_wrong` — **all `acme`** (0 nordic). All blank `gt_item_code`, all `lexical_unique` (mostly @ 1.0), raw text is an exact / near-exact catalogue `item_name` hit, typically no buyer_sku/barcode. Families skewed hardware: PVCP / ANGL / SELF (+ a few others).
 
-**(checked) Not the cause:**
+**No clear miss by the system:** Hand + checks found no separating bug pattern the matcher failed to encode.
+- Not UOM — vague `unit`/`ea`/`pcs` also on correct autos; prices that exist sit near `list_price`.
+- Not twins / OOS — no bulk twin to force abstain; stock qty not discriminative.
+- Same shape as many **labeled** exact lexical autos → abstaining this shape would also kill true positives.
 
-- UOM mismatch — vague `unit`/`ea`/`pcs` also on correct autos; when price present, **10/10** within 15% of `list_price` (no pack-price signal).
-- Twins / OOS — no bulk twin on these 17; `available_qty=0` not discriminative.
-- No feature separates blank-GT exact hits from labeled exact hits (same shape: **51 correct + 17 wrong = 68** no-ID exact lexical autos).
+**Label stance:** These are the points I am **questioning as labeled**. Blank GT says “unmatchable / any auto is FP,” but the line text points at a real unique catalogue name. Treating that as a matcher flaw overfits noise; treat as **suspect / under-specified labels** until Product clarifies.
 
-**Decision options considered:**
+**Decision:** **Maintain current auto logic** (do not add an inseparable abstain gate). Explicitly **flag / list these `line_id`s** as contested train labels for EVAL and for anyone re-scoring the set.
 
-- **A** keep auto (accept train FPs)
-- **B** abstain that whole shape → kills 17 FPs but also ~51 TPs; train net on those 68 improves because −800 asymmetry
-- **C** raise floor/margin — useless here (already score 1.0)
-- **D** keep A’s policy + document in EVAL (inseparable label edge)
-- **E** UOM/price veto — rejected by data; out of DESIGN scope
-
-**Lean: Option D.** Keep exact unique text autos. Carry the 17 as known FP class into EVAL/error analysis: model matches the item; label says unmatchable; abstaining the shape is inseparable collateral. Revisit only if holdout shows a worse blank-exact rate or Product wants precision over coverage.
-
-**EVAL note to write later:** cite blank-GT policy from brief (~⅓ no correct answer); show inseparability counts; do not invent a gate without a separating signal.
+**Production (what to counter later — not v1 code):**
+- Human review queue / shadow mode on first-seen exact-name autos without ID corroboration
+- Operator confirm → promote to trusted alias so next time is ID-backed
+- Periodic label audit on blank-GT lines that exact-match catalogue names
+- Only then consider a policy knob (e.g. require ID for auto) if ops cost of wrongs dominates — not from this train slice alone
 
 ### 2026-10-14 — Remove alias confidence floor (`alias_low_trust`)
 
@@ -407,6 +404,48 @@ Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refres
 **Change:** Alias lane emits `pending_text_confirm` when only `*-OLD` maps and a unique active sibling exists. Service autos `alias_old_successor` only if that code is in text retrieval candidates; else unchanged text decide. D-03 → (d).
 
 **Risk:** Assumes catalogue naming `FOO-OLD` ↔ live `FOO`. Wrong if successor is a different code. Gate limits blast radius vs naked strip-auto.
+
+### 2026-10-14 — Cold-start safe tenant discovery + Task 2 `predictions.csv`
+
+**Cold-start (minimal):**
+
+- Removed hardcoded `tenant not in {"acme","nordic"}`.
+- `load_default_catalogues` globs `catalogue_<tenant>.csv`; tenant = filename suffix.
+- `match` rejects only if catalogue for that tenant was never loaded (`unknown_tenant`).
+- Alias / barcode / text unchanged — already tenant-keyed. Empty alias history → continue (no hard stop).
+- Verified with temp `catalogue_newco.csv` + empty `AliasIndex`: barcode auto; unknown SKU falls through to text; `ghost` → `unknown_tenant`.
+
+**Deliverable:** `scripts/run_holdout.py` → `predictions.csv` (exact schema: `line_id,item_code,confidence,decision,reason_code,candidates`). Abstain rows force blank `item_code`.
+
+**Current train vs holdout** (same matcher; train labelled, holdout unlabelled — no precision on holdout):
+
+| | train (`order_lines_train.csv`) | holdout (`predictions.csv`) |
+|---|---|---|
+| lines | 420 | 300 |
+| auto | 239 | 160 |
+| review | 132 | 103 |
+| reject | 49 | 37 |
+| coverage (auto share) | **56.9%** | **53.3%** |
+| auto_correct / auto_wrong | 221 / 18 | n/a (no labels) |
+| precision on auto | **0.925** | n/a |
+| net value (train only) | **−17220** | n/a |
+
+**Reason mix (counts):**
+
+| reason | train | holdout |
+|---|---|---|
+| lexical_unique | 169 | 109 |
+| ambiguous_twins | 73 | 70 |
+| alias_exact | 23 | 14 |
+| alias_old_successor | 35 | 24 |
+| barcode_hit | 12 | 13 |
+| brand_not_in_tenant | 45 | 34 |
+| no_candidate_above_floor | 40 | 20 |
+| ambiguous_margin | 18 | 13 |
+| not_an_item | 4 | 3 |
+| ambiguous_barcode | 1 | 0 |
+
+Coverage is close (train a bit higher — more alias history on train customers). Holdout reason shape tracks train; no holdout labels so do not invent precision. Re-run: `python scripts/run_train_smoke.py` / `python scripts/run_holdout.py`.
 
 ---
 

@@ -70,7 +70,7 @@ class MatchService:
             line = OrderLine.from_mapping(line)
 
         tenant = line.tenant
-        if tenant not in {"acme", "nordic"}:
+        if not self.catalogue.has_tenant(tenant):
             return MatchResult(
                 decision="reject",
                 reason_code="unknown_tenant",
