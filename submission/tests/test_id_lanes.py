@@ -102,14 +102,15 @@ class AliasLaneTests(unittest.TestCase):
         self.assertEqual(out.tentative.reason_code, "alias_exact")
         self.assertEqual(out.tentative.item_code, "ACM-LIVE")
 
-    def test_low_trust_hard_review(self) -> None:
+    def test_low_conf_unique_still_autos(self) -> None:
+        # Train: all alias@0.55 unique hits matched GT — conf floor removed (see MINDLOG).
         self._add("SKU1", "ACM-LIVE", 0.55)
         out = run_alias("acme", "CUST-1", "SKU1", date(2026, 6, 1), self.aliases, self.cat)
-        self.assertTrue(out.stopped)
-        assert out.result is not None
-        self.assertEqual(out.result.reason_code, "alias_low_trust")
-        self.assertEqual(out.result.decision, "review")
-        self.assertEqual(out.result.item_code, "")
+        self.assertFalse(out.stopped)
+        assert out.tentative is not None
+        self.assertEqual(out.tentative.reason_code, "alias_exact")
+        self.assertEqual(out.tentative.item_code, "ACM-LIVE")
+        self.assertEqual(out.tentative.confidence, 0.55)
 
     def test_ambiguous_alias(self) -> None:
         self._add("SKU1", "ACM-LIVE", 1.0)

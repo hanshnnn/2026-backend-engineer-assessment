@@ -14,19 +14,19 @@ Format (from assessment brief):
 
 ## Seeded from DESIGN (to be expanded with evidence during build/eval)
 
-## D-01 — Alias auto on confidence only (≥ 0.72), ignore source
+## D-01 — Alias auto on uniqueness only (no conf floor), ignore source
 **Context:** Alias map mixes confirmed_order / inferred_match / manual_import with conf in {0.55, 0.72, 1.0}.
-**Options:** (a) confirmed_order ∧ high conf (b) conf ≥ 0.72 only (c) any in-date unique alias.
-**Chose:** (b).
-**Evidence:** TBD on train net value; conf is a single knob; confirmed@0.55 still refuses.
-**Reversal trigger:** If alias@0.72 FPs dominate EVAL, raise floor to 1.0 or add source belt.
+**Options:** (a) confirmed_order ∧ high conf (b) conf ≥ 0.72 only (c) any in-date unique active alias.
+**Chose:** (c) — revised 2026-10-14 from (b).
+**Evidence:** Train: all 9 `alias_low_trust` @0.55 matched GT; hard review was abstain cost with 0 FP saved on this set. See MINDLOG.
+**Reversal trigger:** Low-conf unique alias FPs on holdout / another tenant’s alias mix → restore floor 0.72 or 1.0, or add source belt.
 
-## D-02 — Low-trust alias → hard review (stop)
+## D-02 — Low-trust alias hard review — retracted
 **Context:** Unique active alias with conf &lt; 0.72.
-**Options:** (a) hard review (b) fall through to text with candidate boost.
-**Chose:** (a).
-**Evidence:** Precision-first under 20× FP cost.
-**Reversal trigger:** If review volume from this reason is excessive and text agreement is reliable, switch to (b).
+**Options:** (a) hard review (b) fall through to text (c) auto anyway if unique.
+**Chose:** (c) as of 2026-10-14 (was (a)).
+**Evidence:** Same as D-01; 9/9 train low-conf uniques correct.
+**Reversal trigger:** Same as D-01 — this assessment’s 0.55 band may not generalise.
 
 ## D-03 — Superseded alias → fall through
 **Context:** Map hits only `*-OLD` / disabled.

@@ -1,4 +1,4 @@
-"""Buyer-SKU alias lane — dirty memory with trust gate."""
+"""Buyer-SKU alias lane — dirty memory with uniqueness gate."""
 
 from __future__ import annotations
 
@@ -8,8 +8,9 @@ from ..alias_index import AliasIndex
 from ..catalogue import CatalogueIndex
 from ..types import Candidate, LaneOutcome, MatchResult, TentativeHit
 
-# Locked in DESIGN / D-01. Tune on train later if needed.
-ALIAS_AUTO_FLOOR = 0.72
+# Unique in-date active alias → auto regardless of confidence band (0.55 / 0.72 / 1.0).
+# Floor kept as a knob for reversal; 0.0 = no conf gate (train evidence 2026-10-14).
+ALIAS_AUTO_FLOOR = 0.0
 
 
 def run_alias(
@@ -53,11 +54,12 @@ def run_alias(
     code = codes[0]
     conf = best[code]
     if conf < auto_floor:
+        # Reversal path only — unused while ALIAS_AUTO_FLOOR == 0.0.
         return LaneOutcome(
             result=MatchResult(
                 decision="review",
                 reason_code="alias_low_trust",
-                item_code="",  # abstain: do not auto
+                item_code="",
                 confidence=conf,
                 candidates=[Candidate(code, conf)],
             )

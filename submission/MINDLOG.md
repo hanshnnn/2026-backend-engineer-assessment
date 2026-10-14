@@ -61,12 +61,12 @@ tenant → barcode → alias → ID checks → text (brand/family/attrs) → fin
 | Date                    | Use `order_date` vs `valid_from` / `valid_to`                        |
 | OLD / disabled          | Drop; if nothing left → **fall through** to text                     |
 | ≥2 different codes left | `review` / `ambiguous_alias` — stop                                  |
-| 1 code, conf **≥ 0.72** | can auto `alias_exact` (ignore `source`)                             |
-| 1 code, conf **< 0.72** | hard `review` / `alias_low_trust` — stop (do not keep going to text) |
+| 1 code, unique after filters | auto `alias_exact` (ignore `source`; **no conf floor** — see 2026-10-14) |
+| ≥2 codes                     | `review` / `ambiguous_alias`                                              |
 
 
-Why ≥ 0.72: data is mostly 0.55 / 0.72 / 1.0. I want 0.72 to auto too, not only perfect 1.0.  
-Why ignore source: one knob (confidence) is simpler; be ready to defend autoing some `inferred_match@1.0`.
+Why ignore source: one knob is simpler; be ready to defend autoing some `inferred_match@1.0`.  
+**Conf floor removed (was ≥0.72):** on this train set every `alias_low_trust` (0.55) matched GT.
 
 **Multi-active example to remember:**  
 `acme/CUST-002/002469423` → hose **and** GI wire if order is on/before 2026-03-31. After expiry, often only one left. Still always check uniqueness.
@@ -158,7 +158,7 @@ Use when building / editing DESIGN later:
 
 1. “Wrong auto is ~20× review — so I optimise net value and bias to precision.”
 2. “Abstain is first-class: twins and junk can have high scores and still refuse.”
-3. “Alias is dirty memory — conf ≥ 0.72 and unique after date/OLD filters; else review or fall through.”
+3. “Alias is dirty memory — unique after date/OLD filters autos (incl. 0.55 on this train); ambiguous still reviews.”
 4. “Cold start = empty alias notebook, same pipeline.”
 5. “Non-item early gate skipped on purpose; residual ID risk; soft oppose; EVAL may force a gate.”
 
@@ -184,6 +184,7 @@ Use when building / editing DESIGN later:
 | 2026-10-14 blank-GT FPs   | 17 exact-name `auto_wrong`; lean Option D — keep auto, explain in EVAL      |
 | 2026-10-14 brand soft     | Drop denylist/`_PRODUCT_START`; catalogue exact+fuzzy; foreign=weak item   |
 | 2026-10-14 item phrase    | Catalogue leaf + brand-stripped name shortlist before attrs                |
+| 2026-10-14 alias floor    | Drop 0.55/`alias_low_trust` gate — unique alias autos; train-only evidence |
 
 
 ---
@@ -387,6 +388,16 @@ Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refres
 **Lean: Option D.** Keep exact unique text autos. Carry the 17 as known FP class into EVAL/error analysis: model matches the item; label says unmatchable; abstaining the shape is inseparable collateral. Revisit only if holdout shows a worse blank-exact rate or Product wants precision over coverage.
 
 **EVAL note to write later:** cite blank-GT policy from brief (~⅓ no correct answer); show inseparability counts; do not invent a gate without a separating signal.
+
+### 2026-10-14 — Remove alias confidence floor (`alias_low_trust`)
+
+**Evidence (this train):** 9 lines were `alias_low_trust` @ 0.55. Every one had candidate == `gt_item_code` (ACM-T-0008, 0035, 0063, 0076, 0158, 0185; NRD-T-0035, 0103, 0157). Hard-stopping them was pure abstain cost with zero FP savings on this set.
+
+**Change:** `ALIAS_AUTO_FLOOR = 0.0` — unique in-date active alias → `alias_exact` tentative auto at any conf band in {0.55, 0.72, 1.0}. Ambiguous (≥2 codes) still `ambiguous_alias`. `alias_low_trust` path kept in code only as a reversal knob.
+
+**Risk / caveat (say in walkthrough):** This is **fit to this assessment’s alias table**. Other customers or a dirtier `inferred_match@0.55` distribution can make low-conf unique aliases wrong. If holdout or a new tenant shows low-conf FPs → restore floor (0.72 or 1.0) or bring back source filter (`confirmed_order` only). Do **not** treat “0.55 always safe” as a universal law.
+
+**Also update when doing DECISIONS.md:** reverse D-01/D-02 evidence; reversal trigger = low-conf alias FPs on holdout or production audit.
 
 ---
 
