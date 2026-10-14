@@ -120,11 +120,23 @@ class AliasLaneTests(unittest.TestCase):
         assert out.result is not None
         self.assertEqual(out.result.reason_code, "ambiguous_alias")
 
-    def test_old_only_falls_through(self) -> None:
+    def test_old_only_no_live_sibling_falls_through(self) -> None:
         self._add("SKU1", "ACM-DEAD-OLD", 1.0)
         out = run_alias("acme", "CUST-1", "SKU1", date(2026, 6, 1), self.aliases, self.cat)
         self.assertFalse(out.stopped)
         self.assertIsNone(out.tentative)
+        self.assertIsNone(out.pending_text_confirm)
+
+    def test_old_only_emits_live_sibling_hint(self) -> None:
+        self.cat.add(_item("acme", "ACM-LIVE-OLD", active=False))
+        self._add("SKU1", "ACM-LIVE-OLD", 0.55)
+        out = run_alias("acme", "CUST-1", "SKU1", date(2026, 6, 1), self.aliases, self.cat)
+        self.assertFalse(out.stopped)
+        self.assertIsNone(out.tentative)
+        assert out.pending_text_confirm is not None
+        self.assertEqual(out.pending_text_confirm.item_code, "ACM-LIVE")
+        self.assertEqual(out.pending_text_confirm.reason_code, "alias_old_successor")
+        self.assertEqual(out.pending_text_confirm.confidence, 0.55)
 
     def test_expired_falls_through(self) -> None:
         self._add("SKU1", "ACM-LIVE", 1.0, valid_to=date(2026, 3, 31))
@@ -202,6 +214,21 @@ class ServiceIntegrationTests(unittest.TestCase):
         result = self.svc.match(line)
         self.assertEqual(result.decision, "reject")
         self.assertEqual(result.reason_code, "brand_not_in_tenant")
+
+    def test_old_alias_confirmed_by_text_candidates(self) -> None:
+        # ACM-T-0011: sku → ACM-ANGL0886-OLD; text surfaces live ACM-ANGL0886.
+        line = OrderLine(
+            line_id="ACM-T-0011",
+            tenant="acme",
+            customer_id="CUST-001",
+            order_date="2026-08-13",
+            raw_text="need Kanto Grinder Disc Grinding",
+            buyer_sku="001959523",
+        )
+        result = self.svc.match(line)
+        self.assertEqual(result.decision, "auto")
+        self.assertEqual(result.reason_code, "alias_old_successor")
+        self.assertEqual(result.item_code, "ACM-ANGL0886")
 
 
 if __name__ == "__main__":

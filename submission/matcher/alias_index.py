@@ -44,6 +44,19 @@ class AliasIndex:
         key = (row.tenant, row.customer_id, row.buyer_sku)
         self._rows.setdefault(key, []).append(row)
 
+    def lookup_in_force(
+        self,
+        tenant: str,
+        customer_id: str,
+        buyer_sku: str,
+        order_date: date,
+    ) -> list[AliasRow]:
+        """Return in-date alias rows (active or not)."""
+        if not buyer_sku:
+            return []
+        raw = self._rows.get((tenant, customer_id, buyer_sku), [])
+        return [row for row in raw if row.in_force(order_date)]
+
     def lookup(
         self,
         tenant: str,
@@ -53,13 +66,8 @@ class AliasIndex:
         catalogue: CatalogueIndex,
     ) -> list[AliasRow]:
         """Return in-date alias rows that point at active catalogue items."""
-        if not buyer_sku:
-            return []
-        raw = self._rows.get((tenant, customer_id, buyer_sku), [])
         out: list[AliasRow] = []
-        for row in raw:
-            if not row.in_force(order_date):
-                continue
+        for row in self.lookup_in_force(tenant, customer_id, buyer_sku, order_date):
             if not catalogue.is_active(tenant, row.item_code):
                 continue
             out.append(row)

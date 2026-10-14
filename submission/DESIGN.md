@@ -118,7 +118,7 @@ Expensive mistakes are **confident wrong autos**. Common typos that abstain are 
 | --- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | 1   | Auto on non-item / wrong-domain line (e.g. Cadbury on Acme) | ID lanes miss; text / final arb: denylist or no catalogue foothold → reject                        | `not_an_item` / `brand_not_in_tenant`                 |
 | 2   | Twin / missing discriminator (size, class, finish, colour)  | Required-attr abstain when remaining candidates disagree on an omitted attr                        | `ambiguous_twins`                                     |
-| 3   | Superseded / disabled SKU (`*-OLD`, `disabled=1`)           | Catalogue filter on barcode & alias; OLD-only alias **falls through** to text                      | `alias_superseded` (trace) or later lexical reason    |
+| 3   | Superseded / disabled SKU (`*-OLD`, `disabled=1`)           | Drop inactive; unique `*-OLD` → strip to live sibling; **auto only if** that code ∈ text candidates; else fall through | `alias_old_successor` / lexical reason                |
 | 4   | Dirty alias: low conf, or duplicate buyer SKU → two codes   | After in-date + active filter: ≠1 code → review; conf < 0.72 → hard review; ≥ 0.72 + unique → auto | `ambiguous_alias` / `alias_low_trust` / `alias_exact` |
 | 5   | Cross-tenant resolution                                     | Every lookup tenant-scoped; buyer_sku shaped like `NRD-*` on Acme still maps only to Acme items    | (hard fail if violated)                               |
 | 6   | ID contradicts strong text (or barcode vs alias)            | Soft verify: unique strong text candidate ≠ ID → review; barcode≠alias → review                    | `id_text_conflict` / `id_id_conflict`                 |
@@ -145,7 +145,7 @@ Key: `(tenant, customer_id, buyer_sku)`. Filter: `valid_from/valid_to` vs `order
 - ≥2 distinct codes left → `review` / `ambiguous_alias` (stop).
 - 1 code, `confidence >= 0.72` → tentative auto / `alias_exact` (source ignored; conf is the knob).
 - 1 code, `confidence < 0.72` → `review` / `alias_low_trust`, candidates = that code (stop).
-- Only superseded/expired/empty → **fall through** to text.
+- Only superseded/expired/empty → strip unique `*-OLD` to active live code; if that code appears in text candidates → auto `alias_old_successor`; else **fall through** to text.
 
 
 
@@ -176,7 +176,7 @@ Both cost ~abstention in the objective unless ops later prices them differently.
 
 **In scope.** Single-line matcher as above; train-tuned operating point; explainable `reason_code`s; eval harness foundation; offline stdlib + allowed libs only.
 
-**Out of scope.** Order-level context (“same as last month”); learning aliases from operator confirmations; full UOM/price consistency engine; OCR/channel-specific parsers; automatic OLD→successor rewrite (fall through + text instead); production shadow/canary (discussed in `SCALE.md` later).
+**Out of scope.** Order-level context (“same as last month”); learning aliases from operator confirmations; full UOM/price consistency engine; OCR/channel-specific parsers; naked OLD→successor auto without text confirm; production shadow/canary (discussed in `SCALE.md` later).
 
 **What we’d need in production before building the out-of-scope pieces.** Shadow-mode FP sampling, per-customer alias audit rates, catalogue diff/successor metadata quality, and measured review-queue cost by `reason_code`.
 

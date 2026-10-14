@@ -28,12 +28,12 @@ Format (from assessment brief):
 **Evidence:** Same as D-01; 9/9 train low-conf uniques correct.
 **Reversal trigger:** Same as D-01 — this assessment’s 0.55 band may not generalise.
 
-## D-03 — Superseded alias → fall through
+## D-03 — Superseded alias → strip -OLD only if text confirms
 **Context:** Map hits only `*-OLD` / disabled.
-**Options:** (a) hard review (b) fall through to text (c) strip -OLD to active sibling.
-**Chose:** (b).
-**Evidence:** Train lines where map is OLD but gt is live code (e.g. ACM-T-0011 family).
-**Reversal trigger:** If successor metadata becomes reliable, consider (c) with review on doubt.
+**Options:** (a) hard review (b) fall through to text (c) strip -OLD to active sibling always (d) strip -OLD → auto only if live code ∈ text candidates.
+**Chose:** (d) as of 2026-10-14 (was (b)).
+**Evidence:** Train `abstain_miss`+SKU: all 29 were OLD-only fallthrough; gated strip recovered 16/29 with 0 FP; 13 stay review when text misses the live code.
+**Reversal trigger:** Holdout FP where `-OLD` sibling ≠ true successor but text still ranks it; or successor metadata makes naked (c) safer than text gate.
 
 ## D-04 — ID vs text soft verify; barcode≠alias → id_id_conflict
 **Context:** ID lanes can disagree with each other or with strong text.

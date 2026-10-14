@@ -47,6 +47,8 @@ class LaneOutcome:
 
     result: Optional[MatchResult] = None
     tentative: Optional[TentativeHit] = None
+    # OLD/disabled-only alias → live sibling; auto only if text candidates confirm.
+    pending_text_confirm: Optional[TentativeHit] = None
 
     @property
     def stopped(self) -> bool:

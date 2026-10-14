@@ -59,7 +59,7 @@ tenant → barcode → alias → ID checks → text (brand/family/attrs) → fin
 | ----------------------- | -------------------------------------------------------------------- |
 | Lookup key              | `(tenant, customer_id, buyer_sku)`                                   |
 | Date                    | Use `order_date` vs `valid_from` / `valid_to`                        |
-| OLD / disabled          | Drop; if nothing left → **fall through** to text                     |
+| OLD / disabled          | Drop; unique `*-OLD` → strip live sibling; auto iff ∈ text cands (`alias_old_successor`); else fall through |
 | ≥2 different codes left | `review` / `ambiguous_alias` — stop                                  |
 | 1 code, unique after filters | auto `alias_exact` (ignore `source`; **no conf floor** — see 2026-10-14) |
 | ≥2 codes                     | `review` / `ambiguous_alias`                                              |
@@ -121,6 +121,7 @@ Why ignore source: one knob is simpler; be ready to defend autoing some `inferre
 | Code                                  | Rough meaning                          |
 | ------------------------------------- | -------------------------------------- |
 | `alias_exact`                         | Trusted unique alias auto              |
+| `alias_old_successor`                 | OLD map stripped to live; text cands confirm |
 | `alias_low_trust`                     | Unique alias but conf too low → review |
 | `ambiguous_alias`                     | Two+ codes for one buyer SKU           |
 | `barcode_hit`                         | Barcode auto                           |
@@ -395,9 +396,17 @@ Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refres
 
 **Change:** `ALIAS_AUTO_FLOOR = 0.0` — unique in-date active alias → `alias_exact` tentative auto at any conf band in {0.55, 0.72, 1.0}. Ambiguous (≥2 codes) still `ambiguous_alias`. `alias_low_trust` path kept in code only as a reversal knob.
 
-**Risk / caveat (say in walkthrough):** This is **fit to this assessment’s alias table**. Other customers or a dirtier `inferred_match@0.55` distribution can make low-conf unique aliases wrong. If holdout or a new tenant shows low-conf FPs → restore floor (0.72 or 1.0) or bring back source filter (`confirmed_order` only). Do **not** treat “0.55 always safe” as a universal law.
+**Risk / caveat:** This is **fit to this assessment’s alias table**. Other customers or a dirtier `inferred_match@0.55` distribution can make low-conf unique aliases wrong. If holdout or a new tenant shows low-conf FPs → restore floor (0.72 or 1.0) or bring back source filter (`confirmed_order` only). Do **not** treat “0.55 always safe” as a universal law.
 
 **Also update when doing DECISIONS.md:** reverse D-01/D-02 evidence; reversal trigger = low-conf alias FPs on holdout or production audit.
+
+### 2026-10-14 — OLD alias + text-candidate confirm (`alias_old_successor`)
+
+**Evidence (`train_smoke_trust allias.csv`):** 29 `abstain_miss` with buyer_sku — all OLD-only fallthrough. Strip `-OLD` == GT for all 29. Gate “live code ∈ text candidates” → **16** would auto correctly, **0** FP; **13** stay review (text never ranked the live code).
+
+**Change:** Alias lane emits `pending_text_confirm` when only `*-OLD` maps and a unique active sibling exists. Service autos `alias_old_successor` only if that code is in text retrieval candidates; else unchanged text decide. D-03 → (d).
+
+**Risk:** Assumes catalogue naming `FOO-OLD` ↔ live `FOO`. Wrong if successor is a different code. Gate limits blast radius vs naked strip-auto.
 
 ---
 

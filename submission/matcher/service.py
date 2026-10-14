@@ -13,7 +13,7 @@ from .catalogue import CatalogueIndex, load_default_catalogues
 from .lanes.alias import run_alias
 from .lanes.barcode import run_barcode
 from .lanes.text import decide_text, retrieve_text
-from .types import MatchResult
+from .types import Candidate, MatchResult
 
 
 def _parse_order_date(value: str) -> date:
@@ -95,7 +95,7 @@ class MatchService:
         if al.stopped:
             return al.result  # type: ignore[return-value]
 
-        # Text retrieve once: soft oppose for ID, or full decide if no ID.
+        # Text retrieve once: soft oppose for ID, OLD-successor confirm, or decide.
         retrieval = retrieve_text(tenant, line.raw_text, self.catalogue)
 
         # (3) ID arbitration (+ soft text oppose)
@@ -103,6 +103,21 @@ class MatchService:
             id_result = arbitrate_id(bc.tentative, al.tentative, retrieval)
             if id_result is not None:
                 return id_result
+
+        # (3b) OLD-only alias → live sibling, only if text already surfaces it.
+        hint = al.pending_text_confirm
+        if hint is not None:
+            cand_codes = {c.item_code for c in retrieval.candidates}
+            if hint.item_code in cand_codes:
+                return MatchResult(
+                    decision="auto",
+                    reason_code=hint.reason_code,
+                    item_code=hint.item_code,
+                    confidence=hint.confidence,
+                    candidates=list(hint.candidates)
+                    if hint.candidates
+                    else [Candidate(hint.item_code, hint.confidence)],
+                )
 
         # (4) text lane
         return decide_text(retrieval)
