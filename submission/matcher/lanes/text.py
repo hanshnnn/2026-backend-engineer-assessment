@@ -1,4 +1,4 @@
-"""Lexical text lane: brand (soft) → family → attr filter → twin check → RapidFuzz."""
+"""Lexical text lane: brand (soft) → item phrase → attrs/twins → decide."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from ..attrs import (
 from ..brand import BrandHit, detect_brand, looks_brand_shaped
 from ..catalogue import CatalogueIndex, CatalogueItem
 from ..normalize import normalize_text
+from ..phrases import shortlist_by_phrase
 from ..types import Candidate, MatchResult
 
 AUTO_FLOOR = 0.90
@@ -23,7 +24,8 @@ MARGIN = 0.03
 REVIEW_FLOOR = 0.72
 SOFT_OPPOSE_FLOOR = 0.90
 FUZZ_LIMIT = 8
-# Below this, a brand-shaped leading token that matched no tenant brand → foreign refuse.
+PHRASE_FLOOR = 0.65
+PHRASE_LIMIT = 15
 FOREIGN_ITEM_WEAK = 0.72
 
 _NON_ITEM_PHRASES = (
@@ -57,20 +59,8 @@ def _is_misc(item: CatalogueItem) -> bool:
     return False
 
 
-def _family_narrow(text: str, items: list[CatalogueItem]) -> list[CatalogueItem]:
-    by_leaf: dict[str, list[CatalogueItem]] = {}
-    for it in items:
-        leaf = (it.item_group.split(">")[-1] if it.item_group else "").strip().lower()
-        if leaf:
-            by_leaf.setdefault(leaf, []).append(it)
-    leaves = sorted(by_leaf.keys(), key=len, reverse=True)
-    for leaf in leaves:
-        if leaf and leaf in text:
-            return by_leaf[leaf]
-    return items
-
-
 def _score_candidates(norm: str, pool: list[CatalogueItem]) -> list[Candidate]:
+    """Final rank on full item_name (includes brand + attrs as written in catalogue)."""
     if not pool:
         return []
     choices = {it.item_code: normalize_text(it.item_name) for it in pool}
@@ -87,14 +77,7 @@ def _score_candidates(norm: str, pool: list[CatalogueItem]) -> list[Candidate]:
     ]
 
 
-def _maybe_foreign_refuse(
-    hit: BrandHit,
-    cands: list[Candidate],
-) -> str | None:
-    """
-    No hardcoded foreign list: brand-shaped leading token, matched no tenant brand,
-    and item retrieval is weak → brand_not_in_tenant.
-    """
+def _maybe_foreign_refuse(hit: BrandHit, cands: list[Candidate]) -> str | None:
     if hit.brand is not None:
         return None
     if not looks_brand_shaped(hit.leading_token):
@@ -123,18 +106,16 @@ def retrieve_text(tenant: str, raw_text: str, catalogue: CatalogueIndex) -> Text
         for it in catalogue.items_for_tenant(tenant)
         if it.active and not _is_misc(it)
     ]
-    # Soft restrict: brand hit narrows pool; miss keeps full active catalogue.
     if hit.brand:
         branded = [it for it in pool if it.brand == hit.brand]
         if branded:
             pool = branded
 
-    pool = _family_narrow(norm, pool)
-
-    item_attrs_map = {it.item_code: extract_item_attrs(it.item_name) for it in pool}
-    filtered = [it for it in pool if item_matches_query(qattrs, item_attrs_map[it.item_code])]
-    if not filtered:
-        # Still allow foreign refuse when pool empty after attrs (e.g. Cadbury).
+    # (2) Item phrase shortlist — catalogue leaf + brand-stripped name (no hand lists).
+    ranked = shortlist_by_phrase(
+        norm, pool, hit.brand, limit=PHRASE_LIMIT, floor=PHRASE_FLOOR
+    )
+    if not ranked:
         foreign = _maybe_foreign_refuse(hit, [])
         return TextRetrieval(
             norm,
@@ -146,17 +127,38 @@ def retrieve_text(tenant: str, raw_text: str, catalogue: CatalogueIndex) -> Text
             brand_how=hit.how,
         )
 
-    pool = filtered
-    pool_attrs = [item_attrs_map[it.item_code] for it in pool]
+    shortlist = [it for it, _score in ranked]
 
+    # (3) Attrs only on the phrase shortlist.
+    item_attrs_map = {it.item_code: extract_item_attrs(it.item_name) for it in shortlist}
+    filtered = [it for it in shortlist if item_matches_query(qattrs, item_attrs_map[it.item_code])]
+    if not filtered:
+        # Keep phrase candidates for recall@3 / foreign check.
+        weak_cands = [
+            Candidate(it.item_code, score) for it, score in ranked[:3]
+        ]
+        foreign = _maybe_foreign_refuse(hit, weak_cands)
+        return TextRetrieval(
+            norm,
+            hit.brand,
+            len(shortlist),
+            weak_cands,
+            refuse_reason=foreign or "no_candidate_above_floor",
+            query_attrs=qattrs,
+            brand_how=hit.how,
+        )
+
+    pool_attrs = [item_attrs_map[it.item_code] for it in filtered]
     if unspecified_attr_disagreement(qattrs, pool_attrs):
-        cands = _score_candidates(norm, pool)
+        cands = _score_candidates(norm, filtered)
+        if not cands:
+            cands = [Candidate(it.item_code, sc) for it, sc in ranked if it in filtered][:3]
         foreign = _maybe_foreign_refuse(hit, cands)
         if foreign:
             return TextRetrieval(
                 norm,
                 hit.brand,
-                len(pool),
+                len(filtered),
                 cands,
                 refuse_reason=foreign,
                 query_attrs=qattrs,
@@ -165,20 +167,20 @@ def retrieve_text(tenant: str, raw_text: str, catalogue: CatalogueIndex) -> Text
         return TextRetrieval(
             norm,
             hit.brand,
-            len(pool),
+            len(filtered),
             cands,
             refuse_reason="ambiguous_twins",
             query_attrs=qattrs,
             brand_how=hit.how,
         )
 
-    cands = _score_candidates(norm, pool)
+    cands = _score_candidates(norm, filtered)
     foreign = _maybe_foreign_refuse(hit, cands)
     if foreign:
         return TextRetrieval(
             norm,
             hit.brand,
-            len(pool),
+            len(filtered),
             cands,
             refuse_reason=foreign,
             query_attrs=qattrs,
@@ -188,7 +190,7 @@ def retrieve_text(tenant: str, raw_text: str, catalogue: CatalogueIndex) -> Text
     return TextRetrieval(
         norm,
         hit.brand,
-        len(pool),
+        len(filtered),
         cands,
         query_attrs=qattrs,
         brand_how=hit.how,

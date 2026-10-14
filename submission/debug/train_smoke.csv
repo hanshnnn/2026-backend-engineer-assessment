@@ -1,0 +1,421 @@
+line_id,tenant,customer_id,order_date,raw_text,buyer_sku,raw_barcode,gt_item_code,decision,item_code,confidence,reason_code,candidates,outcome
+ACM-T-0001,acme,CUST-004,2026-06-26,Tolsen Wall Plug 12mm Red,,,ACM-WALL0029,auto,ACM-WALL0029,1.0000,lexical_unique,ACM-WALL0029:1.0000,auto_correct
+ACM-T-0002,acme,CUST-003,2026-07-01,Vermmont  PVC  Pipe  20mmC  lass  E,,,ACM-PVCP1070,auto,ACM-PVCP1070,1.0000,lexical_unique,ACM-PVCP1070:1.0000,auto_correct
+ACM-T-0003,acme,CUST-002,2026-06-13,"item: Remax GRINDING DISC 5"" Grinding",,,ACM-ANGL0336,auto,ACM-ANGL0336,0.9500,lexical_unique,ACM-ANGL0336:0.9500,auto_correct
+ACM-T-0004,acme,CUST-003,2026-04-25,- tolsen safety helmet red standard,,,ACM-SAFE0049,auto,ACM-SAFE0049,1.0000,lexical_unique,ACM-SAFE0049:1.0000,auto_correct
+ACM-T-0005,acme,CUST-007,2026-05-18,Kanto Hose Clip 19-25mm Zinc,,,ACM-HOSE0102,auto,ACM-HOSE0102,1.0000,lexical_unique,ACM-HOSE0102:1.0000|ACM-HOSE0857:0.8569,auto_correct
+ACM-T-0006,acme,CUST-006,2026-05-06,- Stallion Angle Grinder Disc Flap,,,,review,,0.9552,ambiguous_twins,ACM-ANGL0765:0.9552|ACM-ANGL0985:0.9552|ACM-ANGL0858:0.9552,abstain_ok
+ACM-T-0007,acme,CUST-005,2026-05-15,Kanto/Self/Drilling/Screw/#8/x/3/4''/Zinc/Plated/x6,,,ACM-SELF0326,auto,ACM-SELF0326,0.9691,lexical_unique,ACM-SELF0326:0.9691,auto_correct
+ACM-T-0008,acme,CUST-004,2026-04-11,"Kanto Ball Valve 1"" PVC",004784961,,ACM-BALL0123,review,,0.5500,alias_low_trust,ACM-BALL0123:0.5500,abstain_miss
+ACM-T-0009,acme,CUST-007,2026-07-12,"Remax/Ball/Valve/2""/SS304",,,,review,,1.0000,ambiguous_margin,ACM-BALL0659:1.0000|ACM-BALL0073:0.9706,abstain_ok
+ACM-T-0010,acme,CUST-001,2026-08-16,Vermont  GI  Wire  Soft,001245731,,ACM-GIWI0811,review,,0.9500,ambiguous_margin,ACM-GIWI0774:0.9500|ACM-GIWI0516:0.9500|ACM-GIWI0811:0.9500,abstain_miss
+ACM-T-0011,acme,CUST-001,2026-08-13,need Kanto Grinder Disc Grinding,001959523,,ACM-ANGL0886,review,,0.9500,ambiguous_twins,ACM-ANGL0886:0.9500|ACM-ANGL0716:0.9500|ACM-ANGL0788:0.9500,abstain_miss
+ACM-T-0012,acme,CUST-003,2026-06-14,Stallion PVC 25mm E,,,,review,,0.8550,ambiguous_twins,ACM-PVCP0643B:0.8550|ACM-PVCP0643:0.8550,abstain_ok
+ACM-T-0013,acme,CUST-003,2026-08-23,Cadbury Dairy Milk 165g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0014,acme,CUST-006,2026-05-14,same as last month order,,,,reject,,0.0000,not_an_item,,abstain_ok
+ACM-T-0015,acme,CUST-006,2026-07-14,"- Hitex Angle Grinder Disc 7"" Flap",,,,auto,ACM-ANGL0280,1.0000,lexical_unique,ACM-ANGL0280:1.0000,auto_wrong
+ACM-T-0016,acme,CUST-001,2026-08-15,need Kanto Masking TTape 12mm HighTemp,,,ACM-MASK0163,auto,ACM-MASK0163,0.9697,lexical_unique,ACM-MASK0163:0.9697|ACM-MASK0061:0.8125,auto_correct
+ACM-T-0017,acme,CUST-007,2026-08-14,pls send Kanto Masking Tape 24Mm General,,,ACM-MASK0183,auto,ACM-MASK0183,0.9500,lexical_unique,ACM-MASK0183:0.9500|ACM-MASK0032:0.7804,auto_correct
+ACM-T-0018,acme,CUST-004,2026-05-13,Kanto Cable Tie 100mm Natural,,,ACM-CABL0555,review,,1.0000,ambiguous_twins,ACM-CABL0555:1.0000|ACM-CABL0833:0.8313|ACM-CABL0885:0.8313,abstain_miss
+ACM-T-0019,acme,CUST-007,2026-04-22,pls send Bosco Wire #20 Soft,,,ACM-GIWI0179,review,,0.8805,no_candidate_above_floor,ACM-GIWI0179:0.8805|ACM-GIWI0955:0.7703|ACM-GIWI0652:0.7703,abstain_miss
+ACM-T-0020,acme,CUST-002,2026-07-28,"Bosco Self Drilling Screw #12 x 2"" Stainless 410 x6",,,ACM-SELF0204,auto,ACM-SELF0204,0.9697,lexical_unique,ACM-SELF0204:0.9697,auto_correct
+ACM-T-0021,acme,CUST-005,2026-04-22,Kanto - Cable - Tie - 200mm - Natural - x24,,,ACM-CABL0950,review,,0.9500,ambiguous_twins,ACM-CABL0950:0.9500|ACM-CABL0251:0.8550|ACM-CABL0549:0.8550,abstain_miss
+ACM-T-0022,acme,CUST-004,2026-04-13,Kanto Nitrile Glove M Blue,,,,auto,ACM-NITR0925,1.0000,lexical_unique,ACM-NITR0925:1.0000|ACM-NITR0715:0.9615|ACM-NITR0872:0.9615,auto_wrong
+ACM-T-0023,acme,CUST-003,2026-07-25,Cable Tie 450mm Black,,910597372782,ACM-CABL0816,auto,ACM-CABL0816,1.0000,barcode_hit,ACM-CABL0816:1.0000,auto_correct
+ACM-T-0024,acme,CUST-008,2026-06-13,Remax/Glove/S/Blue,008981867,,ACM-NITR0903,review,,0.9500,ambiguous_twins,ACM-NITR0903:0.9500|ACM-NITR1012:0.8941|ACM-NITR0172:0.8941,abstain_miss
+ACM-T-0025,acme,CUST-004,2026-08-24,Tolsen M8x75 Stainless,,,,review,,0.8550,ambiguous_twins,ACM-HEXB0936:0.8550|ACM-HEXB0028B:0.8550|ACM-HEXB0028:0.8550,abstain_ok
+ACM-T-0026,acme,CUST-002,2026-04-20,Epson 003 ink black bottle,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0027,acme,CUST-004,2026-08-04,subtotal,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0028,acme,CUST-003,2026-04-20,"Stallion Ball Valve 1-1/4"" PVC",,,,auto,ACM-BALL0667,1.0000,lexical_unique,ACM-BALL0667:1.0000|ACM-BALL0662:0.9310,auto_wrong
+ACM-T-0029,acme,CUST-008,2026-08-27,"urgent Stallion Anggle Grinder Disc 7"" Cuting",,,ACM-ANGL0006,review,,0.8916,ambiguous_twins,ACM-ANGL0006:0.8916|ACM-ANGL0473:0.8095|ACM-ANGL0985:0.7750,abstain_miss
+ACM-T-0030,acme,CUST-002,2026-05-08,Hitex PVCP ipe1 5mm Class E,,,ACM-PVCP0941,review,,0.9048,no_candidate_above_floor,ACM-PVCP0941:0.9048|ACM-PVCP0023:0.9048|ACM-PVCP1009:0.9048,abstain_miss
+ACM-T-0031,acme,CUST-005,2026-04-08,need Bosco Nitrile Glove S Blue,,,ACM-NITR0655,auto,ACM-NITR0655,1.0000,lexical_unique,ACM-NITR0655:1.0000|ACM-NITR0569:0.9615|ACM-NITR0470:0.9615,auto_correct
+ACM-T-0032,acme,CUST-002,2026-06-11,Hitex/Ball/Valve/3/4''/SS304,,,ACM-BALL0575,auto,ACM-BALL0575,1.0000,lexical_unique,ACM-BALL0575:1.0000|ACM-BALL0929:0.9444,auto_correct
+ACM-T-0033,acme,CUST-003,2026-05-10,Hose Clip 38-50mm SS304,,,,review,,0.9500,ambiguous_margin,ACM-HOSE0531:0.9500|ACM-HOSE0678:0.9500|ACM-HOSE0597:0.9500,abstain_ok
+ACM-T-0034,acme,CUST-007,2026-04-02,pls send Bosco Wall Plug 8mm Brown x6 carton,,,ACM-WALL0736,auto,ACM-WALL0736,0.9000,lexical_unique,ACM-WALL0736:0.9000,auto_correct
+ACM-T-0035,acme,CUST-004,2026-05-26,Stallion Hose Clip Zinc,004954508,,ACM-HOSE1069,review,,0.5500,alias_low_trust,ACM-HOSE1069:0.5500,abstain_miss
+ACM-T-0036,acme,CUST-002,2026-06-26,Hitex Masking Tape 18mm General,,,ACM-MASK0959,auto,ACM-MASK0959,1.0000,lexical_unique,ACM-MASK0959:1.0000|ACM-MASK0282:0.8125,auto_correct
+ACM-T-0037,acme,CUST-006,2026-05-23,Vermont - Valve,006508136,,ACM-BALL0954,review,,0.8550,ambiguous_twins,ACM-BALL0364:0.8550|ACM-BALL0682:0.8550|ACM-BALL0954:0.8550,abstain_miss
+ACM-T-0038,acme,CUST-004,2026-04-16,item: Hitex Bolt M6x30 HDG,004048384,,ACM-HEXB0445,auto,ACM-HEXB0445,0.9500,lexical_unique,ACM-HEXB0445:0.9500,auto_correct
+ACM-T-0039,acme,CUST-004,2026-06-06,Cable White,,,,review,,0.8550,ambiguous_twins,ACM-SAFE0582:0.8550|ACM-CABL0054:0.8550|ACM-SAFE0381:0.8550,abstain_ok
+ACM-T-0040,acme,CUST-002,2026-08-11,Copper pipe 22mm x 3m Class 2,,,,review,,0.8550,no_candidate_above_floor,ACM-SELF0276:0.8550|ACM-SELF0686:0.8550|ACM-SELF0121:0.8550,abstain_ok
+ACM-T-0041,acme,CUST-003,2026-04-22,same as last month order,,,,reject,,0.0000,not_an_item,,abstain_ok
+ACM-T-0042,acme,CUST-004,2026-05-27,Remax Hex Bolt M8x50 HDG,,,ACM-HEXB0844,auto,ACM-HEXB0844,1.0000,lexical_unique,ACM-HEXB0844:1.0000,auto_correct
+ACM-T-0043,acme,CUST-004,2026-04-12,Reemax PVC Pipe 25mm Cass E,,,ACM-PVCP1075,review,,0.9630,ambiguous_twins,ACM-PVCP1075:0.9630|ACM-PVCP0949:0.9259|ACM-PVCP0200:0.9259,abstain_miss
+ACM-T-0044,acme,CUST-003,2026-04-04,urgent HITEX CABLE TIE 300MM WHITE,,,ACM-CABL0654,auto,ACM-CABL0654,0.9500,lexical_unique,ACM-CABL0654:0.9500,auto_correct
+ACM-T-0045,acme,CUST-007,2026-06-05,1) Remax Hex Bolt M8x75 Stainless 304,,,ACM-HEXB0714,auto,ACM-HEXB0714,0.9714,lexical_unique,ACM-HEXB0714:0.9714,auto_correct
+ACM-T-0046,acme,CUST-003,2026-08-05,need  Kanto  GI  Wire  #20  Hard  Drawn,,,ACM-GIWI0419,auto,ACM-GIWI0419,1.0000,lexical_unique,ACM-GIWI0419:1.0000|ACM-GIWI0968:0.9286|ACM-GIWI0997:0.9286,auto_correct
+ACM-T-0047,acme,CUST-002,2026-08-08,1) Remax Safety Helmet Yellow Standard,,,ACM-SAFE0984,auto,ACM-SAFE0984,0.9722,lexical_unique,ACM-SAFE0984:0.9722,auto_correct
+ACM-T-0048,acme,CUST-008,2026-06-17,Stallion GI Wire #20 Soft x48,,,ACM-GIWI0948,auto,ACM-GIWI0948,0.9500,lexical_unique,ACM-GIWI0948:0.9500|ACM-GIWI0703:0.8674|ACM-GIWI0871:0.8674,auto_correct
+ACM-T-0049,acme,CUST-006,2026-07-10,Hitex Hex Bolt M6x30 HDG,,,ACM-HEXB0445,auto,ACM-HEXB0445,1.0000,lexical_unique,ACM-HEXB0445:1.0000,auto_correct
+ACM-T-0050,acme,CUST-006,2026-07-25,"Kanto Angle Grinder Disc 7"" Cutting",,,,auto,ACM-ANGL0767,1.0000,lexical_unique,ACM-ANGL0767:1.0000,auto_wrong
+ACM-T-0051,acme,CUST-007,2026-04-25,pls send Kanto Helmet Ratchet,007895118,,ACM-SAFE0579,review,,0.7787,ambiguous_twins,ACM-SAFE0863:0.7787|ACM-SAFE0375:0.7755|ACM-SAFE0360:0.7755,abstain_miss
+ACM-T-0052,acme,CUST-003,2026-04-23,Hex Bolt M8x50,,,,review,,0.9000,ambiguous_twins,ACM-HEXB0965:0.9000|ACM-HEXB0893:0.9000|ACM-HEXB0675:0.9000,abstain_ok
+ACM-T-0053,acme,CUST-007,2026-07-07,Wagyu striploin MB7 grain fed,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0054,acme,CUST-005,2026-07-21,Nescafe Gold refill 170g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0055,acme,CUST-005,2026-08-01,"Remax Angle Grinder Disc 4.5"" Cutting",,,,auto,ACM-ANGL0503,1.0000,lexical_unique,ACM-ANGL0503:1.0000,auto_wrong
+ACM-T-0056,acme,CUST-006,2026-07-13,urgent Kanto GI WWire #16 Sft,,,ACM-GIWI0113,review,,0.8235,no_candidate_above_floor,ACM-GIWI0113:0.8235|ACM-GIWI0728:0.7843|ACM-GIWI0621:0.7843,abstain_miss
+ACM-T-0057,acme,CUST-002,2026-07-23,1) Hietx Cable Tie 300m Natural,,,ACM-CABL1080,review,,0.9153,ambiguous_twins,ACM-CABL1080:0.9153|ACM-CABL0687:0.8814|ACM-CABL0013:0.8814,abstain_miss
+ACM-T-0058,acme,CUST-004,2026-04-26,"Tolsen Ball Valve 1/2"" Pvc",,,ACM-BALL0685,auto,ACM-BALL0685,1.0000,lexical_unique,ACM-BALL0685:1.0000|ACM-BALL0128:0.9600,auto_correct
+ACM-T-0059,acme,CUST-003,2026-05-21,"Bosco Ball Valve 2"" PVC",,,ACM-BALL0011,auto,ACM-BALL0011,1.0000,lexical_unique,ACM-BALL0011:1.0000|ACM-BALL0865:0.9583,auto_correct
+ACM-T-0060,acme,CUST-002,2026-04-23,need Vermont 10mm Red,,,ACM-WALL0817,review,,0.8550,no_candidate_above_floor,ACM-WALL0817:0.8550,abstain_miss
+ACM-T-0061,acme,CUST-002,2026-04-10,Vermont PVC Pipe 50mm Class D x12 case,,,ACM-PVCP1055,review,,0.9500,ambiguous_twins,ACM-PVCP1055:0.9500|ACM-PVCP1055B:0.8746,abstain_miss
+ACM-T-0062,acme,CUST-008,2026-08-22,"Vermont/Ball/Valve/2""/Brass",,,,review,,1.0000,ambiguous_twins,ACM-BALL0944:1.0000|ACM-BALL0879:0.9643|ACM-BALL0208:0.8674,abstain_ok
+ACM-T-0063,acme,CUST-006,2026-04-03,urgent Hitex Nitrile Glove XL Black,006855772,,ACM-NITR0092,review,,0.5500,alias_low_trust,ACM-NITR0092:0.5500,abstain_miss
+ACM-T-0064,acme,CUST-002,2026-08-16,Hitex PVC Pipe 25mm Class C,,,,auto,ACM-PVCP0825,1.0000,lexical_unique,ACM-PVCP0825:1.0000,auto_wrong
+ACM-T-0065,acme,CUST-006,2026-05-15,Hitex Hex HDG,006111861,,ACM-HEXB1044,review,,0.8550,ambiguous_twins,ACM-HEXB0639:0.8550|ACM-HEXB1044:0.8550|ACM-HEXB0734:0.8550,abstain_miss
+ACM-T-0066,acme,CUST-004,2026-06-12,Tolsen Bolt M8x50,,,,review,,0.9500,ambiguous_twins,ACM-HEXB0675:0.9500|ACM-HEXB0675B:0.8550|ACM-HEXB0216:0.8550,abstain_ok
+ACM-T-0067,acme,CUST-001,2026-05-11,Wagyu striploin MB7 grain fed,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0068,acme,CUST-004,2026-08-21,thanks bro,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0069,acme,CUST-002,2026-04-11,Kanto Hex Bolt M10x50 HDG,,,ACM-HEXB0380,auto,ACM-HEXB0380,1.0000,lexical_unique,ACM-HEXB0380:1.0000,auto_correct
+ACM-T-0070,acme,CUST-004,2026-07-20,HitexNitrile love S Blue,,,ACM-NITR0366,auto,ACM-NITR0366,0.9600,lexical_unique,ACM-NITR0366:0.9600|ACM-NITR0617:0.9200|ACM-NITR0973:0.9200,auto_correct
+ACM-T-0071,acme,CUST-007,2026-04-17,"tolsen GRINDING DISC 4.5"" flap",,,ACM-ANGL0444,review,,0.8308,no_candidate_above_floor,ACM-ANGL0444:0.8308,abstain_miss
+ACM-T-0072,acme,CUST-004,2026-05-13,remax hex bolt m10x75 SS304,,,ACM-HEXB0509,auto,ACM-HEXB0509,1.0000,lexical_unique,ACM-HEXB0509:1.0000,auto_correct
+ACM-T-0073,acme,CUST-002,2026-07-21,Kanto/Masking/pita/48mm/High/Temp,,,ACM-MASK0378,auto,ACM-MASK0378,0.9394,lexical_unique,ACM-MASK0378:0.9394|ACM-MASK0203:0.7500,auto_correct
+ACM-T-0074,acme,CUST-005,2026-07-21,- Kanto Ball Valve PVC,,,,review,,0.9500,ambiguous_twins,ACM-BALL0174:0.9500|ACM-BALL0123:0.9500|ACM-BALL0763:0.9500,abstain_ok
+ACM-T-0075,acme,CUST-007,2026-07-10,urgent Bosco PVC Pipe 20mm Class E x48,,,ACM-PVCP0151,auto,ACM-PVCP0151,0.9500,lexical_unique,ACM-PVCP0151:0.9500,auto_correct
+ACM-T-0076,acme,CUST-007,2026-04-14,Remax Safety Helmet Standard,007818288,,ACM-SAFE0299,review,,0.5500,alias_low_trust,ACM-SAFE0299:0.5500,abstain_miss
+ACM-T-0077,acme,CUST-005,2026-05-26,"need Remax Self #10 1-1/2"" Zinc Plated",,984700442168,ACM-SELF0964,auto,ACM-SELF0964,1.0000,barcode_hit,ACM-SELF0964:1.0000,auto_correct
+ACM-T-0078,acme,CUST-001,2026-07-20,"Screw 1-1/2"" Stainless 410",001534384,,ACM-SELF0105,review,,0.8550,no_candidate_above_floor,ACM-SELF0121:0.8550,abstain_miss
+ACM-T-0079,acme,CUST-001,2026-04-24,"Vermont Ball Valve 1/2"" SS304",,,,review,,1.0000,ambiguous_twins,ACM-BALL0364:1.0000|ACM-BALL0525:0.9722|ACM-BALL0364B:0.9500,abstain_ok
+ACM-T-0080,acme,CUST-002,2026-06-02,40mm Class,,,,review,,0.9000,ambiguous_twins,ACM-PVCP0363:0.9000|ACM-PVCP0666:0.9000|ACM-PVCP0666B:0.9000,abstain_ok
+ACM-T-0081,acme,CUST-001,2026-04-19,Duracell AA battery 8 pack,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0082,acme,CUST-002,2026-07-15,Hitex PVC Pipe 32mm Class E,,,,auto,ACM-PVCP0447,1.0000,lexical_unique,ACM-PVCP0447:1.0000,auto_wrong
+ACM-T-0083,acme,CUST-005,2026-07-13,Hitexx Wall Plugg 8mm Red,,,ACM-WALL0724,auto,ACM-WALL0724,0.9583,lexical_unique,ACM-WALL0724:0.9583,auto_correct
+ACM-T-0084,acme,CUST-008,2026-04-28,urgent Kato Hose Clip 19-25m mSS304,,,ACM-HOSE0857,review,,0.7500,ambiguous_twins,ACM-HOSE0857:0.7500,abstain_miss
+ACM-T-0085,acme,CUST-004,2026-06-26,"- hitex ball valve 1"" brass",,,ACM-BALL0507,review,,1.0000,ambiguous_twins,ACM-BALL0507:1.0000|ACM-BALL0511:0.8595|ACM-BALL0227:0.8205,abstain_miss
+ACM-T-0086,acme,CUST-004,2026-05-06,pls send Vermont Safety topi keledar putih Ratchet,,,ACM-SAFE0920,review,,0.8550,ambiguous_twins,ACM-SAFE0100:0.8550|ACM-SAFE0474:0.7464|ACM-SAFE0920:0.7333,abstain_miss
+ACM-T-0087,acme,CUST-008,2026-06-14,Stallion - Masking - Tape - 48mm - General,,,ACM-MASK0596,auto,ACM-MASK0596,0.9500,lexical_unique,ACM-MASK0596:0.9500|ACM-MASK0527:0.7968,auto_correct
+ACM-T-0088,acme,CUST-006,2026-07-13,need Vermont Hex Bolt M6x50 Stainless 304 x24 pkt,,,ACM-HEXB0832,auto,ACM-HEXB0832,0.9500,lexical_unique,ACM-HEXB0832:0.9500,auto_correct
+ACM-T-0089,acme,CUST-002,2026-05-12,1) Tolsen Cable Tie 450mm Natural,,,ACM-CABL0098,review,,0.9677,ambiguous_twins,ACM-CABL0098:0.9677|ACM-CABL0353:0.8360|ACM-CABL0874:0.8360,abstain_miss
+ACM-T-0090,acme,CUST-007,2026-04-09,- Remax Self Drilling #12 x Zinc Plated,007078304,,ACM-SELF0813,auto,ACM-SELF0813,1.0000,alias_exact,ACM-SELF0813:1.0000,auto_correct
+ACM-T-0091,acme,CUST-003,2026-05-28,- Vermont PVC 32mm Class,,973886227128,ACM-PVCP0650,auto,ACM-PVCP0650,1.0000,barcode_hit,ACM-PVCP0650:1.0000,auto_correct
+ACM-T-0092,acme,CUST-003,2026-06-07,Tolsen Hose Clip 19-25mm SS304,003154993,,ACM-HOSE0911,auto,ACM-HOSE0911,1.0000,lexical_unique,ACM-HOSE0911:1.0000,auto_correct
+ACM-T-0093,acme,CUST-005,2026-07-01,Stallion PVC Pipe 25mm E,,,,review,,0.9500,ambiguous_twins,ACM-PVCP0643:0.9500|ACM-PVCP0643B:0.9500|ACM-PVCP0124:0.9087,abstain_ok
+ACM-T-0094,acme,CUST-001,2026-08-27,Cadbury Dairy Milk 165g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0095,acme,CUST-007,2026-07-07,deliver by friday please,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0096,acme,CUST-008,2026-08-28,need  Bosco  Safety  Helmet  Yellow  Ratchet,,,ACM-SAFE0483,auto,ACM-SAFE0483,1.0000,lexical_unique,ACM-SAFE0483:1.0000|ACM-SAFE0410:0.8233,auto_correct
+ACM-T-0097,acme,CUST-002,2026-05-20,"pls send Vermont BBaall Valve 3/4"" Brass",,,ACM-BALL0802,review,,0.8604,no_candidate_above_floor,ACM-BALL0802:0.8604|ACM-BALL0618:0.7887|ACM-BALL0165:0.7600,abstain_miss
+ACM-T-0098,acme,CUST-007,2026-06-05,1) Tolsen Cable Tie 450Mm Natural,,,ACM-CABL0098,review,,0.9677,ambiguous_twins,ACM-CABL0098:0.9677|ACM-CABL0353:0.8360|ACM-CABL0874:0.8360,abstain_miss
+ACM-T-0099,acme,CUST-006,2026-05-15,pls send Stallion Wall Plug 12Mm Red,,,ACM-WALL0556,auto,ACM-WALL0556,0.9500,lexical_unique,ACM-WALL0556:0.9500,auto_correct
+ACM-T-0100,acme,CUST-008,2026-05-15,"need - Kanto - Angle - Grinder - Disc - 5"" - Cutting",,,ACM-ANGL0672,auto,ACM-ANGL0672,0.9500,lexical_unique,ACM-ANGL0672:0.9500,auto_correct
+ACM-T-0101,acme,CUST-004,2026-08-07,Stallion Plug 10mm Red,,,ACM-WALL0524,auto,ACM-WALL0524,0.9500,lexical_unique,ACM-WALL0524:0.9500,auto_correct
+ACM-T-0102,acme,CUST-004,2026-08-27,need Remax Cable Tie 150mm White x24 dozen,,,ACM-CABL1035,auto,ACM-CABL1035,0.9500,lexical_unique,ACM-CABL1035:0.9500,auto_correct
+ACM-T-0103,acme,CUST-004,2026-07-17,M6x50 304,NRD-HEXB0803,,ACM-HEXB0780,auto,ACM-HEXB0780,1.0000,alias_exact,ACM-HEXB0780:1.0000,auto_correct
+ACM-T-0104,acme,CUST-008,2026-06-07,Vermont Bolt M8x50,,993363759884,ACM-HEXB1074,auto,ACM-HEXB1074,1.0000,barcode_hit,ACM-HEXB1074:1.0000,auto_correct
+ACM-T-0105,acme,CUST-008,2026-05-25,GI Wire #18 Hard,008866277,,ACM-GIWI0789,review,,0.9000,ambiguous_margin,ACM-GIWI0997:0.9000|ACM-GIWI0451:0.9000|ACM-GIWI0789:0.9000,abstain_miss
+ACM-T-0106,acme,CUST-003,2026-04-19,Stallion Cable Tie 370mm Black,003603835,,ACM-CABL1003,auto,ACM-CABL1003,1.0000,lexical_unique,ACM-CABL1003:1.0000,auto_correct
+ACM-T-0107,acme,CUST-004,2026-05-06,Vermont PVC 50mm,,,,review,,0.8550,ambiguous_twins,ACM-PVCP1055:0.8550|ACM-PVCP0392:0.8550|ACM-PVCP1055B:0.8550,abstain_ok
+ACM-T-0108,acme,CUST-004,2026-08-18,3M 8210 N95 respirator box 20,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0109,acme,CUST-002,2026-06-10,PO attached,,,,review,,0.0000,no_candidate_above_floor,,abstain_ok
+ACM-T-0110,acme,CUST-007,2026-04-21,Hitex Hex Bolt M10x75 Stainless 316,,,ACM-HEXB0005,auto,ACM-HEXB0005,1.0000,lexical_unique,ACM-HEXB0005:1.0000,auto_correct
+ACM-T-0111,acme,CUST-007,2026-07-16,need Hitex PPVC Pipe 05mm Class E,,,ACM-PVCP1009,review,,0.9302,no_candidate_above_floor,ACM-PVCP0941:0.9302|ACM-PVCP0619:0.9302|ACM-PVCP0023:0.9302,abstain_miss
+ACM-T-0112,acme,CUST-006,2026-06-23,remax - hex - bolt - m8x75 - ZP,,,ACM-HEXB0860,auto,ACM-HEXB0860,0.9500,lexical_unique,ACM-HEXB0860:0.9500,auto_correct
+ACM-T-0113,acme,CUST-007,2026-04-27,Remax  Self  Drilling  skru  #8  x  3/4 inch  Stainless  410,,,ACM-SELF0868,review,,0.9412,ambiguous_twins,ACM-SELF0868:0.9412|ACM-SELF0090:0.9187|ACM-SELF0302:0.8753,abstain_miss
+ACM-T-0114,acme,CUST-007,2026-07-04,Stallion Self Drilling Screw #10 x 1'' Stainless,,,,review,,0.9592,ambiguous_twins,ACM-SELF0720:0.9592|ACM-SELF0681:0.8750,abstain_ok
+ACM-T-0115,acme,CUST-003,2026-07-07,Hitex/Self/Drilling/Screw/#10/x/1-1/2''/Zinc/Plated/x12,,,ACM-SELF0945,auto,ACM-SELF0945,0.9615,lexical_unique,ACM-SELF0945:0.9615,auto_correct
+ACM-T-0116,acme,CUST-007,2026-04-25,Stallion Wall Plug 10mm Blue x24 ctn,,,ACM-WALL0264,auto,ACM-WALL0264,0.9500,lexical_unique,ACM-WALL0264:0.9500,auto_correct
+ACM-T-0117,acme,CUST-004,2026-05-10,"- Remax Angle Grinder Disc 4"" Flap",004007634,,ACM-ANGL0753,auto,ACM-ANGL0753,1.0000,alias_exact,ACM-ANGL0753:1.0000,auto_correct
+ACM-T-0118,acme,CUST-001,2026-04-21,Plug 12mm Blue,,999622531915,ACM-WALL0210,auto,ACM-WALL0210,1.0000,barcode_hit,ACM-WALL0210:1.0000,auto_correct
+ACM-T-0119,acme,CUST-005,2026-06-23,urgent Remax Nitrile Glove S Blue,005739246,,ACM-NITR0903,auto,ACM-NITR0903,0.9500,lexical_unique,ACM-NITR0903:0.9500|ACM-NITR1012:0.9120|ACM-NITR0172:0.9120,auto_correct
+ACM-T-0120,acme,CUST-008,2026-08-17,PVC Pipe Class D,,,,review,,0.8550,ambiguous_twins,ACM-PVCP0297:0.8550|ACM-PVCP1055:0.8550|ACM-PVCP0159:0.8550,abstain_ok
+ACM-T-0121,acme,CUST-003,2026-07-06,Cadbury Dairy Milk 165g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0122,acme,CUST-001,2026-06-01,kindly quote best price,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0123,acme,CUST-007,2026-04-14,Bosco Nitrile Glove L Black,,,,review,,1.0000,ambiguous_margin,ACM-NITR0671:1.0000|ACM-NITR0492:0.9818|ACM-NITR0240:0.9630,abstain_ok
+ACM-T-0124,acme,CUST-005,2026-07-27,"item: Stallion al Valve 3/4"" PVC",,,ACM-BALL0662,auto,ACM-BALL0662,0.9630,lexical_unique,ACM-BALL0662:0.9630|ACM-BALL0667:0.8929,auto_correct
+ACM-T-0125,acme,CUST-008,2026-07-19,- Knato Masking Taep 12mm General,,,ACM-MASK0061,review,,0.9355,ambiguous_twins,ACM-MASK0061:0.9355|ACM-MASK0163:0.7500,abstain_miss
+ACM-T-0126,acme,CUST-008,2026-06-16,bosco masking tape 48mm high temp,,,ACM-MASK0982,auto,ACM-MASK0982,1.0000,lexical_unique,ACM-MASK0982:1.0000|ACM-MASK0327:0.8125,auto_correct
+ACM-T-0127,acme,CUST-004,2026-04-25,Hitex PVC paip 32mm Class E,,,ACM-PVCP0447,auto,ACM-PVCP0447,0.9630,lexical_unique,ACM-PVCP0447:0.9630,auto_correct
+ACM-T-0128,acme,CUST-005,2026-08-19,Hitex Plug 12mm Blue,,,ACM-WALL0532,auto,ACM-WALL0532,0.9500,lexical_unique,ACM-WALL0532:0.9500,auto_correct
+ACM-T-0129,acme,CUST-001,2026-08-17,"Stallion Angle Grinder Disc 4"" Cutting x48",,,ACM-ANGL1000,auto,ACM-ANGL1000,0.9500,lexical_unique,ACM-ANGL1000:0.9500,auto_correct
+ACM-T-0130,acme,CUST-007,2026-07-20,"Remax Self Drilling Screw #8 x 1"" Zinc Plated",,,,auto,ACM-SELF0072,1.0000,lexical_unique,ACM-SELF0072:1.0000,auto_wrong
+ACM-T-0131,acme,CUST-002,2026-05-17,urgent Bosco Cable Tie 100mm White,,,ACM-CABL0910,auto,ACM-CABL0910,0.9500,lexical_unique,ACM-CABL0910:0.9500,auto_correct
+ACM-T-0132,acme,CUST-006,2026-04-13,GI Wire,006495314,,ACM-GIWI0811,review,,0.9000,ambiguous_margin,ACM-GIWI0644:0.9000|ACM-GIWI0419:0.9000|ACM-GIWI0948:0.9000,abstain_miss
+ACM-T-0133,acme,CUST-005,2026-08-16,urgent Pipe 40mm Class D,005178210,,ACM-PVCP0561,review,,0.7925,ambiguous_margin,ACM-PVCP0933:0.7925|ACM-PVCP0337:0.7878|ACM-PVCP0412:0.7878,abstain_miss
+ACM-T-0134,acme,CUST-004,2026-08-16,Tolsen Hex Bolt M8x50 HDG,,,,review,,1.0000,ambiguous_twins,ACM-HEXB0675:1.0000|ACM-HEXB0675B:0.9500,abstain_ok
+ACM-T-0135,acme,CUST-007,2026-07-01,Makita LS1040 mitre saw 240v,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0136,acme,CUST-001,2026-05-09,kindly quote best price,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0137,acme,CUST-001,2026-04-17,Tolsen - Hex - Bolt - M8x30 - Stainless - 304,,,ACM-HEXB1020,review,,0.9500,ambiguous_twins,ACM-HEXB1020:0.9500|ACM-HEXB0717:0.8924|ACM-HEXB0701:0.8550,abstain_miss
+ACM-T-0138,acme,CUST-007,2026-05-15,Stallion HHex Bolt M8x50 Stainless 316,,,ACM-HEXB0374,auto,ACM-HEXB0374,0.9867,lexical_unique,ACM-HEXB0374:0.9867,auto_correct
+ACM-T-0139,acme,CUST-007,2026-06-01,"Hitex Ball Valve 1-1/4"" Brass",,,ACM-BALL0045,review,,1.0000,ambiguous_twins,ACM-BALL0045:1.0000|ACM-BALL0408:0.9286|ACM-BALL0403:0.8740,abstain_miss
+ACM-T-0140,acme,CUST-005,2026-06-12,"Stallion Angle Grinder Disc 7"" Flap",,,ACM-ANGL0985,auto,ACM-ANGL0985,1.0000,lexical_unique,ACM-ANGL0985:1.0000,auto_correct
+ACM-T-0141,acme,CUST-006,2026-08-25,-/Stallion/Cable/450mm/White,,,ACM-CABL0744,auto,ACM-CABL0744,0.9500,lexical_unique,ACM-CABL0744:0.9500,auto_correct
+ACM-T-0142,acme,CUST-006,2026-07-10,Kanto PVC Pipe 25mm Class C,,,,auto,ACM-PVCP1037,1.0000,lexical_unique,ACM-PVCP1037:1.0000,auto_wrong
+ACM-T-0143,acme,CUST-004,2026-04-21,pls send Remax GI Wire #16 Hard Drawn x12 case,,,ACM-GIWI0627,auto,ACM-GIWI0627,0.9000,lexical_unique,ACM-GIWI0627:0.9000|ACM-GIWI0505:0.8679|ACM-GIWI0961:0.8679,auto_correct
+ACM-T-0144,acme,CUST-008,2026-07-11,Kanto Hex Bolt M8x50 HDG,,,ACM-HEXB0115,auto,ACM-HEXB0115,1.0000,lexical_unique,ACM-HEXB0115:1.0000,auto_correct
+ACM-T-0145,acme,CUST-002,2026-06-13,1) Bosco Hex Bolt M8x30 HDG,,,ACM-HEXB0572,auto,ACM-HEXB0572,0.9600,lexical_unique,ACM-HEXB0572:0.9600,auto_correct
+ACM-T-0146,acme,CUST-002,2026-05-24,Vermont Hex Bolt M8x30 Stainless 316,002376574,,ACM-HEXB0743,auto,ACM-HEXB0743,1.0000,lexical_unique,ACM-HEXB0743:1.0000,auto_correct
+ACM-T-0147,acme,CUST-004,2026-08-16,Cable Tie 200mm White,,,,auto,ACM-CABL0054,0.9500,lexical_unique,ACM-CABL0054:0.9500,auto_wrong
+ACM-T-0148,acme,CUST-007,2026-08-12,Epson 003 ink black bottle,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0149,acme,CUST-007,2026-06-15,Nescafe Gold refill 170g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0150,acme,CUST-003,2026-04-07,"Vermont Self Drilling Screw #10 x 1"" Zinc Plated",,,,auto,ACM-SELF0108,1.0000,lexical_unique,ACM-SELF0108:1.0000,auto_wrong
+ACM-T-0151,acme,CUST-007,2026-05-24,Tolsen Cablle Tie 3700mm White,,,ACM-CABL0689,review,,0.9545,no_candidate_above_floor,ACM-CABL0866:0.9545|ACM-CABL0689:0.9545|ACM-CABL0034:0.9091,abstain_miss
+ACM-T-0152,acme,CUST-008,2026-05-02,Tolsen Hex Boolt M8x50 HDGG (Bulk),,,ACM-HEXB0675B,auto,ACM-HEXB0675B,0.9677,lexical_unique,ACM-HEXB0675B:0.9677,auto_correct
+ACM-T-0153,acme,CUST-004,2026-07-23,Hitex Hex Bolt M10X75 SS316,,,ACM-HEXB0005,auto,ACM-HEXB0005,1.0000,lexical_unique,ACM-HEXB0005:1.0000,auto_correct
+ACM-T-0154,acme,CUST-001,2026-08-14,Stallion Hex Bolt M10x75 HDG,,,ACM-HEXB0426,auto,ACM-HEXB0426,1.0000,lexical_unique,ACM-HEXB0426:1.0000,auto_correct
+ACM-T-0155,acme,CUST-004,2026-07-09,Vermont Cable 100mm,,,,review,,0.8550,ambiguous_twins,ACM-CABL0322:0.8550|ACM-CABL0657:0.8550,abstain_ok
+ACM-T-0156,acme,CUST-003,2026-07-06,"Hitex Angle Grinder Disc 7"" Cutting x48 pkt",,,ACM-ANGL0533,auto,ACM-ANGL0533,0.9500,lexical_unique,ACM-ANGL0533:0.9500,auto_correct
+ACM-T-0157,acme,CUST-004,2026-05-17,Tolsen - PVC - Pipe - 25mm - Class - C,,,,review,,0.9500,ambiguous_twins,ACM-PVCP0117:0.9500|ACM-PVCP1051:0.9148|ACM-PVCP0394:0.9148,abstain_ok
+ACM-T-0158,acme,CUST-002,2026-04-08,Stallion PVC Class,002727011,,ACM-PVCP0192,review,,0.5500,alias_low_trust,ACM-PVCP0192:0.5500,abstain_miss
+ACM-T-0159,acme,CUST-006,2026-07-25,Tolsen Nitrile Glove,,929890864095,ACM-NITR0574,auto,ACM-NITR0574,1.0000,barcode_hit,ACM-NITR0574:1.0000,auto_correct
+ACM-T-0160,acme,CUST-007,2026-04-08,Kanto Cable 370mm Black,007420999,,ACM-CABL0287,auto,ACM-CABL0287,0.9500,lexical_unique,ACM-CABL0287:0.9500,auto_correct
+ACM-T-0161,acme,CUST-004,2026-07-04,"Hitex Angle Grinder Disc 4.5"" Flap",,,,review,,1.0000,ambiguous_twins,ACM-ANGL0411:1.0000|ACM-ANGL0411B:0.9500,abstain_ok
+ACM-T-0162,acme,CUST-006,2026-05-22,Nescafe Gold refill 170g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0163,acme,CUST-008,2026-05-09,pls confirm stock first,,,,review,,0.0000,no_candidate_above_floor,,abstain_ok
+ACM-T-0164,acme,CUST-003,2026-06-10,Vermont Hex Bolt M12x60 Zinc Plated,,,ACM-HEXB0566,auto,ACM-HEXB0566,1.0000,lexical_unique,ACM-HEXB0566:1.0000,auto_correct
+ACM-T-0165,acme,CUST-008,2026-05-04,Vermont Hex  Bolt M6x3 HDG,,,ACM-HEXB0433,review,,0.9714,no_candidate_above_floor,ACM-HEXB0433:0.9714|ACM-HEXB0401:0.9143|ACM-HEXB0198:0.9143,abstain_miss
+ACM-T-0166,acme,CUST-006,2026-05-21,"BOSCO GRINDING DISC 5"" FLAP",,,ACM-ANGL1068,review,,0.8136,no_candidate_above_floor,ACM-ANGL1068:0.8136,abstain_miss
+ACM-T-0167,acme,CUST-006,2026-08-28,Bosco Hose Clip 38-50Mm Zinc,,,ACM-HOSE1094,auto,ACM-HOSE1094,1.0000,lexical_unique,ACM-HOSE1094:1.0000|ACM-HOSE0597:0.8569,auto_correct
+ACM-T-0168,acme,CUST-006,2026-05-16,need Bosco Cable Tie 200mm Natural,,,ACM-CABL0452,review,,1.0000,ambiguous_twins,ACM-CABL0452:1.0000|ACM-CABL0786:0.8313|ACM-CABL0772:0.8313,abstain_miss
+ACM-T-0169,acme,CUST-001,2026-04-16,Vermont Ball Valve PVC,,,,review,,0.9500,ambiguous_twins,ACM-BALL0208:0.9500|ACM-BALL0999:0.9500|ACM-BALL0165:0.9500,abstain_ok
+ACM-T-0170,acme,CUST-006,2026-07-14,Bosco Hex Bolt M8x30 HDG x24 dozen,,,ACM-HEXB0572,auto,ACM-HEXB0572,0.9500,lexical_unique,ACM-HEXB0572:0.9500,auto_correct
+ACM-T-0171,acme,CUST-007,2026-05-16,Bosco  Ball  Valve  3/4 inch  SS304,,,ACM-BALL0797,review,,0.9189,ambiguous_twins,ACM-BALL0797:0.9189|ACM-BALL0946:0.9048|ACM-BALL1083:0.9048,abstain_miss
+ACM-T-0172,acme,CUST-003,2026-06-21,"Valve 2"" Brass",,944734710871,ACM-BALL0688,auto,ACM-BALL0688,1.0000,barcode_hit,ACM-BALL0688:1.0000,auto_correct
+ACM-T-0173,acme,CUST-005,2026-07-15,"Vermont Ball Valve 3/4""",005676456,,ACM-BALL0954,review,,0.9500,ambiguous_twins,ACM-BALL0802:0.9500|ACM-BALL0165:0.9500|ACM-BALL0682:0.9068,abstain_miss
+ACM-T-0174,acme,CUST-002,2026-06-21,Tolsen Hex Bolt M8x50,,,,review,,0.9500,ambiguous_twins,ACM-HEXB0675:0.9500|ACM-HEXB0675B:0.9500|ACM-HEXB0216:0.9000,abstain_ok
+ACM-T-0175,acme,CUST-005,2026-08-22,PVC 15mm Class D,,,,review,,0.8550,ambiguous_margin,ACM-PVCP0794:0.8550|ACM-PVCP0563:0.8550|ACM-PVCP0501:0.8550,abstain_ok
+ACM-T-0176,acme,CUST-008,2026-08-24,3M 8210 N95 respirator box 20,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0177,acme,CUST-001,2026-05-11,"- Vermont Self Drilling Screw #10 x 1-1/2"" Stainless 410",,,,auto,ACM-SELF0464,1.0000,lexical_unique,ACM-SELF0464:1.0000,auto_wrong
+ACM-T-0178,acme,CUST-005,2026-07-01,urgent Kanto Hex Bolt M6x30 Stainles 361,,,ACM-HEXB0086,review,,0.8649,ambiguous_twins,ACM-HEXB0086:0.8649|ACM-HEXB1063:0.8550|ACM-HEXB0542:0.8378,abstain_miss
+ACM-T-0179,acme,CUST-007,2026-04-05,"Remax Ball Valve "" 1PVC",,,ACM-BALL0729,review,,0.9565,ambiguous_twins,ACM-BALL0729:0.9565|ACM-BALL0215:0.9565|ACM-BALL0831:0.9167,abstain_miss
+ACM-T-0180,acme,CUST-002,2026-04-28,Stallion Gi Wire #20 Hard Drawn,,,ACM-GIWI0841,auto,ACM-GIWI0841,1.0000,lexical_unique,ACM-GIWI0841:1.0000|ACM-GIWI1005:0.9355|ACM-GIWI0097:0.9355,auto_correct
+ACM-T-0181,acme,CUST-001,2026-07-13,"Kanto Angle Grinder Disc 4"" Cutting",,,ACM-ANGL0217,auto,ACM-ANGL0217,1.0000,lexical_unique,ACM-ANGL0217:1.0000,auto_correct
+ACM-T-0182,acme,CUST-004,2026-07-14,Stallion PVC Pipe 15mm Class E,,,,auto,ACM-PVCP0541,1.0000,lexical_unique,ACM-PVCP0541:1.0000,auto_wrong
+ACM-T-0183,acme,CUST-008,2026-05-02,Stallion Cable Tie 450mm Black x24,,,ACM-CABL1008,auto,ACM-CABL1008,0.9500,lexical_unique,ACM-CABL1008:0.9500,auto_correct
+ACM-T-0184,acme,CUST-006,2026-08-16,item: STALLION DRILLING SCREW #12 X 2'' PLATED,006216604,,ACM-SELF0079,auto,ACM-SELF0079,0.7200,alias_exact,ACM-SELF0079:0.7200,auto_correct
+ACM-T-0185,acme,CUST-003,2026-05-07,Safety Helmet Standard,003516998,,ACM-SAFE0725,review,,0.5500,alias_low_trust,ACM-SAFE0725:0.5500,abstain_miss
+ACM-T-0186,acme,CUST-005,2026-05-05,PVC 20mm Class E,,964596040533,ACM-PVCP1070,auto,ACM-PVCP1070,1.0000,barcode_hit,ACM-PVCP1070:1.0000,auto_correct
+ACM-T-0187,acme,CUST-002,2026-04-27,Stallion Clip 25-38mm SS304,002351852,,ACM-HOSE0191,auto,ACM-HOSE0191,0.9500,lexical_unique,ACM-HOSE0191:0.9500,auto_correct
+ACM-T-0188,acme,CUST-005,2026-07-03,Stallion PVC Pipe E,,,,review,,0.8757,ambiguous_twins,ACM-PVCP0643B:0.8757|ACM-PVCP0482:0.8757|ACM-PVCP0666:0.8757,abstain_ok
+ACM-T-0189,acme,CUST-007,2026-08-24,Wagyu striploin MB7 grain fed,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0190,acme,CUST-001,2026-04-14,thanks bro,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0191,acme,CUST-008,2026-06-15,item:  Remax  Wall  Plug  6mm  Brown,,,ACM-WALL0143,auto,ACM-WALL0143,1.0000,lexical_unique,ACM-WALL0143:1.0000,auto_correct
+ACM-T-0192,acme,CUST-001,2026-06-03,"-  Hitex  Slf  Driling  Screw  #12  x  2""  Stainless  410",,,ACM-SELF0250,auto,ACM-SELF0250,0.9787,lexical_unique,ACM-SELF0250:0.9787,auto_correct
+ACM-T-0193,acme,CUST-003,2026-07-07,hitex hex bolt m10x50 SS316,,,ACM-HEXB0930,auto,ACM-HEXB0930,1.0000,lexical_unique,ACM-HEXB0930:1.0000,auto_correct
+ACM-T-0194,acme,CUST-002,2026-08-27,STALLION WALL PLUG 8MM BROWN,,,ACM-WALL0066,auto,ACM-WALL0066,1.0000,lexical_unique,ACM-WALL0066:1.0000,auto_correct
+ACM-T-0195,acme,CUST-003,2026-07-06,Tolsen Cable Tie 100mm putih,,,ACM-CABL0461,review,,0.8571,ambiguous_twins,ACM-CABL0461:0.8571|ACM-CABL1016:0.8360|ACM-CABL0560:0.8360,abstain_miss
+ACM-T-0196,acme,CUST-002,2026-06-12,"Bosco Ball Valve 1/2"" SS304",,,,review,,1.0000,ambiguous_margin,ACM-BALL0305:1.0000|ACM-BALL0946:0.9706,abstain_ok
+ACM-T-0197,acme,CUST-001,2026-04-13,Stallion  Hex  Bolt  M6x30  Stainless  316  x6  dozen,,,ACM-HEXB0517,auto,ACM-HEXB0517,0.9500,lexical_unique,ACM-HEXB0517:0.9500,auto_correct
+ACM-T-0198,acme,CUST-002,2026-06-20,"Remax Angle Grinder Disc 5"" Flap",,,,auto,ACM-ANGL0947,1.0000,lexical_unique,ACM-ANGL0947:1.0000,auto_wrong
+ACM-T-0199,acme,CUST-007,2026-04-17,"urgent Kanto Angle Grinder Disc 4.5"" Cutting",,,ACM-ANGL1019,auto,ACM-ANGL1019,0.9500,lexical_unique,ACM-ANGL1019:0.9500,auto_correct
+ACM-T-0200,acme,CUST-007,2026-07-20,Kanto Ratchet,007428936,,ACM-SAFE0579,review,,0.8550,ambiguous_twins,ACM-SAFE0863:0.8550|ACM-SAFE0375:0.8550|ACM-SAFE0360:0.8550,abstain_miss
+ACM-T-0201,acme,CUST-006,2026-04-24,Kanto Cable Tie 370mm,006402725,,ACM-CABL0287,review,,0.9500,ambiguous_twins,ACM-CABL0287:0.9500|ACM-CABL0418:0.9500|ACM-CABL0990:0.9500,abstain_miss
+ACM-T-0202,acme,CUST-005,2026-08-10,"Hitex Angle Grinder Disc 4.5"" Flap",,,,review,,1.0000,ambiguous_twins,ACM-ANGL0411:1.0000|ACM-ANGL0411B:0.9500,abstain_ok
+ACM-T-0203,acme,CUST-008,2026-07-05,Nescafe Gold refill 170g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0204,acme,CUST-002,2026-08-16,pls confirm stock first,,,,review,,0.0000,no_candidate_above_floor,,abstain_ok
+ACM-T-0205,acme,CUST-006,2026-05-06,Stallion/Hex/Bolt/M10x75/Stainless/316,,,ACM-HEXB0781,auto,ACM-HEXB0781,1.0000,lexical_unique,ACM-HEXB0781:1.0000,auto_correct
+ACM-T-0206,acme,CUST-002,2026-05-02,Tolsen    Ange  Grinder  Disc  5''  Flap,,,ACM-ANGL0940,auto,ACM-ANGL0940,0.9846,lexical_unique,ACM-ANGL0940:0.9846,auto_correct
+ACM-T-0207,acme,CUST-002,2026-08-17,Tolsen Pvc Pipe 40Mm Class D,,,ACM-PVCP1032,auto,ACM-PVCP1032,1.0000,lexical_unique,ACM-PVCP1032:1.0000,auto_correct
+ACM-T-0208,acme,CUST-008,2026-08-18,1) Stallion Hex Bolt M8x30 Stainless 316,,,ACM-HEXB1062,auto,ACM-HEXB1062,0.9737,lexical_unique,ACM-HEXB1062:0.9737,auto_correct
+ACM-T-0209,acme,CUST-002,2026-05-14,pls send Masking Tape 24mm High Temp,,,ACM-MASK0286B,review,,0.9143,ambiguous_twins,ACM-MASK0286:0.9143|ACM-MASK0761:0.8550|ACM-MASK0237:0.8550,abstain_miss
+ACM-T-0210,acme,CUST-008,2026-08-20,pls send Hitex Hex Bolt M8x30 Zinc Plated x48,,,ACM-HEXB0613,auto,ACM-HEXB0613,0.9500,lexical_unique,ACM-HEXB0613:0.9500,auto_correct
+ACM-T-0211,acme,CUST-007,2026-06-06,urgent Stallion Masking Tape 12mm General x24,,,ACM-MASK0698,auto,ACM-MASK0698,0.9500,lexical_unique,ACM-MASK0698:0.9500|ACM-MASK0405:0.7968,auto_correct
+ACM-T-0212,acme,CUST-003,2026-05-22,"Stallion Self Drilling Screw #8 x 3/4"" Stainless 410",,,,auto,ACM-SELF0989,1.0000,lexical_unique,ACM-SELF0989:1.0000,auto_wrong
+ACM-T-0213,acme,CUST-003,2026-08-12,need Hitex Wall Plug 8mm Brown,,,ACM-WALL0898,auto,ACM-WALL0898,1.0000,lexical_unique,ACM-WALL0898:1.0000,auto_correct
+ACM-T-0214,acme,CUST-004,2026-05-06,Stallion Self Screw x Stainless 410,004279195,,ACM-SELF0105,review,,0.9500,ambiguous_twins,ACM-SELF0989:0.9500|ACM-SELF0056:0.9500|ACM-SELF0720:0.9500,abstain_miss
+ACM-T-0215,acme,CUST-003,2026-04-16,Bosco Cable Tie White,,,,review,,0.9500,ambiguous_twins,ACM-CABL0910:0.9500|ACM-CABL0109:0.9500|ACM-CABL0646:0.9500,abstain_ok
+ACM-T-0216,acme,CUST-006,2026-08-09,Cadbury Dairy Milk 165g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0217,acme,CUST-008,2026-05-10,pls confirm stock first,,,,review,,0.0000,no_candidate_above_floor,,abstain_ok
+ACM-T-0218,acme,CUST-004,2026-06-21,Tolsen PVC Pipe 40mm Class C,,,,auto,ACM-PVCP0471,1.0000,lexical_unique,ACM-PVCP0471:1.0000,auto_wrong
+ACM-T-0219,acme,CUST-001,2026-07-09,need Bosco PVC Pie 32mmm Class C,,,ACM-PVCP0075,review,,0.9630,ambiguous_twins,ACM-PVCP0075:0.9630|ACM-PVCP0820:0.9259|ACM-PVCP0306:0.9259,abstain_miss
+ACM-T-0220,acme,CUST-006,2026-06-03,"urgent Stallion Ball Valve 1/2""PVC",,,ACM-BALL0812,review,,0.8710,no_candidate_above_floor,ACM-BALL0812:0.8710|ACM-BALL0626:0.8333,abstain_miss
+ACM-T-0221,acme,CUST-007,2026-07-25,remax pvc pipe 40mm class c,,,ACM-PVCP1002,auto,ACM-PVCP1002,1.0000,lexical_unique,ACM-PVCP1002:1.0000,auto_correct
+ACM-T-0222,acme,CUST-005,2026-05-24,"Vermont Ball Valve 3/4"" Brass",,,ACM-BALL0802,review,,1.0000,ambiguous_twins,ACM-BALL0802:1.0000|ACM-BALL0618:0.9333|ACM-BALL0165:0.8740,abstain_miss
+ACM-T-0223,acme,CUST-006,2026-08-15,Tolsen PVC Pipe 25mm Class D,,,,auto,ACM-PVCP0394,1.0000,lexical_unique,ACM-PVCP0394:1.0000,auto_wrong
+ACM-T-0224,acme,CUST-008,2026-04-22,"Tolsen Self Drilling Screw #8 x 3/4"" Stainless 410 x6",,,ACM-SELF0129,auto,ACM-SELF0129,0.9709,lexical_unique,ACM-SELF0129:0.9709,auto_correct
+ACM-T-0225,acme,CUST-003,2026-07-02,Self Screw #10 Stainless 410,003687296,,ACM-SELF0995,auto,ACM-SELF0995,0.7200,alias_exact,ACM-SELF0995:0.7200,auto_correct
+ACM-T-0226,acme,CUST-008,2026-08-25,urgent - Kanto - Safety - Standard,008373901,,ACM-SAFE0916,auto,ACM-SAFE0916,1.0000,alias_exact,ACM-SAFE0916:1.0000,auto_correct
+ACM-T-0227,acme,CUST-004,2026-04-10,Bosco Bolt M12x60 Stainless 304,004775539,,ACM-HEXB0762,auto,ACM-HEXB0762,0.9500,lexical_unique,ACM-HEXB0762:0.9500,auto_correct
+ACM-T-0228,acme,CUST-006,2026-07-17,Bosco PVC Pipe 25mm,006438422,,ACM-PVCP0306,review,,0.9500,ambiguous_twins,ACM-PVCP0025:0.9500|ACM-PVCP0306:0.9500|ACM-PVCP0134:0.9500,abstain_miss
+ACM-T-0229,acme,CUST-007,2026-05-20,"Remax Drilling Screw #10 1"" Stainless 410",,,,review,,0.9500,no_candidate_above_floor,ACM-SELF0302:0.9500|ACM-SELF0302B:0.9500|ACM-SELF0766:0.9075,abstain_ok
+ACM-T-0230,acme,CUST-008,2026-05-13,Makita LS1040 mitre saw 240v,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0231,acme,CUST-008,2026-06-06,pls confirm stock first,,,,review,,0.0000,no_candidate_above_floor,,abstain_ok
+ACM-T-0232,acme,CUST-001,2026-08-12,Remax  PVC  Pipe  32mm  Class  D,,,,auto,ACM-PVCP0537,1.0000,lexical_unique,ACM-PVCP0537:1.0000,auto_wrong
+ACM-T-0233,acme,CUST-001,2026-04-14,1) Hitex Hx Bolt M6x0 Stainless 316,,,ACM-HEXB0491,review,,0.9286,no_candidate_above_floor,ACM-HEXB0491:0.9286|ACM-HEXB0359:0.9286|ACM-HEXB0320:0.8929,abstain_miss
+ACM-T-0234,acme,CUST-004,2026-07-03,"vermont ball valve 2"" pvc",,,ACM-BALL0208,auto,ACM-BALL0208,1.0000,lexical_unique,ACM-BALL0208:1.0000|ACM-BALL0983:0.9615,auto_correct
+ACM-T-0235,acme,CUST-001,2026-05-21,need Tolsen PVC paip 40mm Class C,,,ACM-PVCP0471,auto,ACM-PVCP0471,0.9643,lexical_unique,ACM-PVCP0471:0.9643,auto_correct
+ACM-T-0236,acme,CUST-005,2026-07-10,Vermont Cable 300mm Natural,,,ACM-CABL0438,review,,0.9500,ambiguous_twins,ACM-CABL0438:0.9500|ACM-CABL1050:0.7848|ACM-CABL0161:0.7848,abstain_miss
+ACM-T-0237,acme,CUST-004,2026-08-10,Hex/Bolt/M8x30/Zinc,,,,review,,0.9000,ambiguous_margin,ACM-HEXB0387:0.9000|ACM-HEXB0147:0.9000|ACM-HEXB0613:0.9000,abstain_ok
+ACM-T-0238,acme,CUST-004,2026-04-25,Vermont Cable Tie 100mm White x24 pkt,,,ACM-CABL0322,auto,ACM-CABL0322,0.9500,lexical_unique,ACM-CABL0322:0.9500,auto_correct
+ACM-T-0239,acme,CUST-006,2026-05-10,Hitex GI Wire #18 Soft,,,ACM-GIWI0644,auto,ACM-GIWI0644,1.0000,lexical_unique,ACM-GIWI0644:1.0000|ACM-GIWI0226:0.9545|ACM-GIWI0377:0.9545,auto_correct
+ACM-T-0240,acme,CUST-006,2026-04-22,Remax Wall Plug 6mm Brown,,,ACM-WALL0143,auto,ACM-WALL0143,1.0000,lexical_unique,ACM-WALL0143:1.0000,auto_correct
+ACM-T-0241,acme,CUST-001,2026-08-21,"need Kanto Angle Disc 7""",001722076,,ACM-ANGL0886,review,,0.8550,ambiguous_twins,ACM-ANGL0886:0.8550|ACM-ANGL0767:0.8550|ACM-ANGL0051:0.8550,abstain_miss
+ACM-T-0242,acme,CUST-006,2026-08-26,"Hitex Angle Disc 4.5""",,,,review,,0.8550,ambiguous_twins,ACM-ANGL0845:0.8550|ACM-ANGL0411:0.8550|ACM-ANGL0036:0.8550,abstain_ok
+ACM-T-0243,acme,CUST-002,2026-08-21,Wagyu striploin MB7 grain fed,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0244,acme,CUST-008,2026-06-17,3M 8210 N95 respirator box 20,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0245,acme,CUST-006,2026-04-18,Stallion  Hex  Bolt  M8x75  Stainless  316,,,ACM-HEXB0723,auto,ACM-HEXB0723,1.0000,lexical_unique,ACM-HEXB0723:1.0000,auto_correct
+ACM-T-0246,acme,CUST-004,2026-06-18,item: Kanto PVCC Ppe 40mm Class D,,,ACM-PVCP0412,review,,0.9630,ambiguous_twins,ACM-PVCP0412:0.9630|ACM-PVCP0412B:0.8814,abstain_miss
+ACM-T-0247,acme,CUST-003,2026-05-01,"Remax Self Drrilling Screw #8 x 1"" Stainless 40",,,ACM-SELF0090,review,,0.9787,ambiguous_twins,ACM-SELF0090:0.9787|ACM-SELF0072:0.8261,abstain_miss
+ACM-T-0248,acme,CUST-002,2026-05-18,"VERMONT SELF DRILLING SCREW #10 X 1"" S/S 410",,,ACM-SELF0069,review,,0.9268,ambiguous_twins,ACM-SELF0069:0.9268|ACM-SELF0108:0.8769,abstain_miss
+ACM-T-0249,acme,CUST-003,2026-04-22,Bosco Cable Tie 300mm putih,,,ACM-CABL0109,review,,0.8519,ambiguous_twins,ACM-CABL0109:0.8519|ACM-CABL0035:0.8313|ACM-CABL1031:0.8313,abstain_miss
+ACM-T-0250,acme,CUST-004,2026-08-07,pls send Kanto Nitrile Glove L,,,ACM-NITR0872,review,,0.8489,ambiguous_twins,ACM-NITR0872:0.8489|ACM-NITR0017:0.8313|ACM-NITR0925:0.8022,abstain_miss
+ACM-T-0251,acme,CUST-008,2026-06-27,"Vermont Ball Valve 1-1/4"" SS304 x12",,,ACM-BALL0778,review,,0.9512,ambiguous_margin,ACM-BALL0778:0.9512|ACM-BALL0954:0.9236,abstain_miss
+ACM-T-0252,acme,CUST-007,2026-07-16,Vermont Cable Tie 300mm Natural,,,ACM-CABL0438,review,,1.0000,ambiguous_twins,ACM-CABL0438:1.0000|ACM-CABL1050:0.8404|ACM-CABL0161:0.8404,abstain_miss
+ACM-T-0253,acme,CUST-002,2026-04-21,Kanto Hex Stainless 304,002668002,,ACM-HEXB0139,auto,ACM-HEXB0139,1.0000,alias_exact,ACM-HEXB0139:1.0000,auto_correct
+ACM-T-0254,acme,CUST-006,2026-07-11,Kanto Ball,,987929993679,ACM-BALL0213,auto,ACM-BALL0213,1.0000,barcode_hit,ACM-BALL0213:1.0000,auto_correct
+ACM-T-0255,acme,CUST-003,2026-08-22,urgent  Self  Drilling  Screw  #10  x,003704427,,ACM-SELF0105,review,,0.8550,ambiguous_twins,ACM-SELF0590:0.8550|ACM-SELF0276:0.8550|ACM-SELF0069:0.8550,abstain_miss
+ACM-T-0256,acme,CUST-005,2026-06-26,"Remax Drilling Screw #10 1"" 410",,,,review,,0.8550,no_candidate_above_floor,ACM-SELF0302:0.8550|ACM-SELF0288:0.8550|ACM-SELF0694:0.8550,abstain_ok
+ACM-T-0257,acme,CUST-002,2026-07-15,Copper pipe 22mm x 3m Class 2,,,,review,,0.8550,no_candidate_above_floor,ACM-SELF0276:0.8550|ACM-SELF0686:0.8550|ACM-SELF0121:0.8550,abstain_ok
+ACM-T-0258,acme,CUST-001,2026-05-22,delivery charge,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+ACM-T-0259,acme,CUST-006,2026-06-15,"need Tolsen Angle Grinder Disc 4.5"" Grinding",,,ACM-ANGL0222,auto,ACM-ANGL0222,1.0000,lexical_unique,ACM-ANGL0222:1.0000,auto_correct
+ACM-T-0260,acme,CUST-004,2026-04-21,Vermont Cable Tie 1100mm Blck,,,ACM-CABL0657,review,,0.9524,no_candidate_above_floor,ACM-CABL0657:0.9524|ACM-CABL1050:0.9048|ACM-CABL0499:0.9048,abstain_miss
+NRD-T-0001,nordic,CUST-003,2026-07-01,1) Golden Pantry Chicken Breast Whole 5kg,,,NRD-CHIC0379,auto,NRD-CHIC0379,0.9744,lexical_unique,NRD-CHIC0379:0.9744|NRD-CHIC0144:0.8718|NRD-CHIC0437:0.8563,auto_correct
+NRD-T-0002,nordic,CUST-004,2026-05-05,Cape ay Potato Frise Wedge 1kg,,,NRD-POTA0344,review,,0.8550,no_candidate_above_floor,NRD-PRAW0285:0.8550,abstain_miss
+NRD-T-0003,nordic,CUST-008,2026-05-03,Cape Bay FC MILK Fresh 2L,,,NRD-FULL0447,review,,0.8894,no_candidate_above_floor,NRD-FULL0447:0.8894|NRD-FULL0307:0.8276|NRD-FULL0264:0.8205,abstain_miss
+NRD-T-0004,nordic,CUST-003,2026-04-09,nordvik FC MILK uht 200ml,,,NRD-FULL0287,review,,0.8894,no_candidate_above_floor,NRD-FULL0287:0.8894|NRD-FULL0462:0.8000|NRD-FULL0348:0.7953,abstain_miss
+NRD-T-0005,nordic,CUST-001,2026-05-21,Cape  Bay  Salmon  Fillet  Side  3kg,,,NRD-SALM0319,auto,NRD-SALM0319,1.0000,lexical_unique,NRD-SALM0319:1.0000|NRD-SALM0050:0.9062|NRD-SALM0124:0.8667,auto_correct
+NRD-T-0006,nordic,CUST-002,2026-05-20,Sisu Whipping Cream 38% 1L,,,,review,,1.0000,ambiguous_twins,NRD-WHIP0334:1.0000|NRD-WHIP0069:0.9615|NRD-WHIP0334B:0.9500,abstain_ok
+NRD-T-0007,nordic,CUST-004,2026-04-17,Sisu/Butter/Unsalted/Block/250g/x48/box,,,NRD-BUTT0336,auto,NRD-BUTT0336,0.9500,lexical_unique,NRD-BUTT0336:0.9500|NRD-BUTT0179:0.8482,auto_correct
+NRD-T-0008,nordic,CUST-006,2026-06-25,fjordal unsalted block 5kg,006053336,,NRD-BUTT0436,auto,NRD-BUTT0436,1.0000,alias_exact,NRD-BUTT0436:1.0000,auto_correct
+NRD-T-0009,nordic,CUST-006,2026-06-24,Golden Pantry Full Cream Milk UHT 200ml,,973863540740,NRD-FULL0174,review,,0.0000,ambiguous_barcode,NRD-FULL0174B:1.0000|NRD-FULL0174:1.0000,abstain_miss
+NRD-T-0010,nordic,CUST-006,2026-06-14,Bay 16/20 2kg,006703262,,NRD-PRAW0055,review,,0.8550,ambiguous_margin,NRD-PUFF0426:0.8550|NRD-MOZZ0109:0.8550|NRD-SQUI0089:0.8550,abstain_miss
+NRD-T-0011,nordic,CUST-005,2026-06-22,Fjordal Vanilla Ice 4L,005932621,,NRD-VANI0327,auto,NRD-VANI0327,0.9500,lexical_unique,NRD-VANI0327:0.9500|NRD-VANI0479:0.8805|NRD-VANI0243:0.8805,auto_correct
+NRD-T-0012,nordic,CUST-002,2026-08-19,Halberg Squid Ring Breaded 1kg,,,,review,,1.0000,ambiguous_twins,NRD-SQUI0021:1.0000|NRD-SQUI0021B:0.9500|NRD-SQUI0106:0.8929,abstain_ok
+NRD-T-0013,nordic,CUST-003,2026-05-19,Duracell AA battery 8 pack,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0014,nordic,CUST-002,2026-06-26,----,,,,reject,,0.0000,not_an_item,,abstain_ok
+NRD-T-0015,nordic,CUST-007,2026-05-17,Golden Pantry Salmon Fillet Portion 3kg,,,NRD-SALM0084,auto,NRD-SALM0084,1.0000,lexical_unique,NRD-SALM0084:1.0000|NRD-SALM0484:0.8831|NRD-SALM0298:0.8800,auto_correct
+NRD-T-0016,nordic,CUST-004,2026-06-09,urgent Sisu Cicken Beast Whole 1kg,,,NRD-CHIC0087,review,,0.8571,ambiguous_margin,NRD-CHIC0087:0.8571|NRD-PRAW0285:0.8550|NRD-PRAW0387:0.8550,abstain_miss
+NRD-T-0017,nordic,CUST-004,2026-04-14,- Halberg Butter UNSLT Block 5Kg,,,NRD-BUTT0194,auto,NRD-BUTT0194,0.9524,lexical_unique,NRD-BUTT0194:0.9524|NRD-BUTT0321:0.7937|NRD-PUFF0459:0.7458,auto_correct
+NRD-T-0018,nordic,CUST-001,2026-05-28,Golden Pantry mentega Unsalted Sheet 250g,,,NRD-BUTT0093,review,,0.8889,no_candidate_above_floor,NRD-BUTT0093:0.8889,abstain_miss
+NRD-T-0019,nordic,CUST-001,2026-06-04,Nordvik Full Cream UHT 200ml,,,NRD-FULL0287,auto,NRD-FULL0287,0.9500,lexical_unique,NRD-FULL0287:0.9500|NRD-FULL0348:0.8769|NRD-FULL0462:0.8621,auto_correct
+NRD-T-0020,nordic,CUST-001,2026-07-23,Golden/Pantry/Potato/Fries/10mm/1kg/x12,,,NRD-POTA0188,auto,NRD-POTA0188,0.9500,lexical_unique,NRD-POTA0188:0.9500,auto_correct
+NRD-T-0021,nordic,CUST-003,2026-08-11,- Fjordal Salmon Fillet Portion 1kg x24 doz,,,NRD-SALM0218,auto,NRD-SALM0218,0.9500,lexical_unique,NRD-SALM0218:0.9500|NRD-SALM0489:0.8636|NRD-SALM0216:0.8333,auto_correct
+NRD-T-0022,nordic,CUST-006,2026-06-20,Cape Bay Beef Patty 150g 48s,006284601,,NRD-BEEF0445,auto,NRD-BEEF0445,1.0000,alias_exact,NRD-BEEF0445:1.0000,auto_correct
+NRD-T-0023,nordic,CUST-008,2026-04-04,pls - send - Fjordal - Beef - Patty - 100g - 12s,,,NRD-BEEF0395,review,,0.8550,ambiguous_twins,NRD-BEEF0395:0.8550|NRD-BEEF0214:0.8550|NRD-BEEF0214B:0.8550,abstain_miss
+NRD-T-0024,nordic,CUST-006,2026-04-28,Nordvik Chicken Breast Diced 5kg,006435030,,NRD-CHIC0253,auto,NRD-CHIC0253,1.0000,lexical_unique,NRD-CHIC0253:1.0000|NRD-CHIC0468:0.8750|NRD-CHIC0412:0.8615,auto_correct
+NRD-T-0025,nordic,CUST-003,2026-04-22,Nordvik Salmon Fillet Portion 5kg,,,,review,,1.0000,ambiguous_twins,NRD-SALM0142:1.0000|NRD-SALM0142B:0.9500|NRD-SALM0100:0.8636,abstain_ok
+NRD-T-0026,nordic,CUST-008,2026-04-12,Copper pipe 22mm x 3m Class 2,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0027,nordic,CUST-004,2026-06-24,same as last month order,,,,reject,,0.0000,not_an_item,,abstain_ok
+NRD-T-0028,nordic,CUST-007,2026-08-08,Sisu Full Cream Milk Fresh 1L,,,NRD-FULL0417,auto,NRD-FULL0417,1.0000,lexical_unique,NRD-FULL0417:1.0000|NRD-FULL0038:0.9655|NRD-FULL0127:0.9180,auto_correct
+NRD-T-0029,nordic,CUST-007,2026-08-07,need Sisu ozzrella Shredded 2kg,,,NRD-MOZZ0205,auto,NRD-MOZZ0205,0.9630,lexical_unique,NRD-MOZZ0205:0.9630|NRD-MOZZ0175:0.8235,auto_correct
+NRD-T-0030,nordic,CUST-008,2026-06-22,urgent Hablerg Puff Pasry Block 5kg,,,NRD-PUFF0459,review,,0.8438,no_candidate_above_floor,NRD-PUFF0459:0.8438,abstain_miss
+NRD-T-0031,nordic,CUST-007,2026-08-04,FJORDAL POTATO FRIES 7MM 2.5KG,,,NRD-POTA0238,auto,NRD-POTA0238,1.0000,lexical_unique,NRD-POTA0238:1.0000,auto_correct
+NRD-T-0032,nordic,CUST-003,2026-06-10,Sisu Full Cream susu Fresh 1L,,,NRD-FULL0417,auto,NRD-FULL0417,1.0000,lexical_unique,NRD-FULL0417:1.0000|NRD-FULL0038:0.9655|NRD-FULL0127:0.9180,auto_correct
+NRD-T-0033,nordic,CUST-003,2026-07-20,pls/send/Golden/Pantry/Chicken/Whole/1kg,,,NRD-CHIC0289,review,,0.8536,no_candidate_above_floor,NRD-CHIC0289:0.8536,abstain_miss
+NRD-T-0034,nordic,CUST-003,2026-06-23,Nordvik Squid Ring Breaded 1kg x24 case,,,NRD-SQUI0306,auto,NRD-SQUI0306,0.9500,lexical_unique,NRD-SQUI0306:0.9500|NRD-SQUI0112:0.8550,auto_correct
+NRD-T-0035,nordic,CUST-004,2026-06-09,- - Nordvik - Chicken - Breast - Strips,004384380,,NRD-CHIC0197,review,,0.5500,alias_low_trust,NRD-CHIC0197:0.5500,abstain_miss
+NRD-T-0036,nordic,CUST-006,2026-05-18,1)  Fjordal  Prawn  21/25  2kg,,,NRD-PRAW0013,auto,NRD-PRAW0013,0.9583,lexical_unique,NRD-PRAW0013:0.9583|NRD-PRAW0275:0.8750|NRD-PRAW0224:0.8333,auto_correct
+NRD-T-0037,nordic,CUST-005,2026-04-01,Fjordal Breast Whole 2kg,005513008,,NRD-CHIC0324,auto,NRD-CHIC0324,0.9500,lexical_unique,NRD-CHIC0324:0.9500|NRD-CHIC0490:0.8143|NRD-CHIC0107:0.8143,auto_correct
+NRD-T-0038,nordic,CUST-003,2026-04-22,Breast 1kg,003449087,,NRD-CHIC0486,review,,0.8550,ambiguous_margin,NRD-POTA0139:0.8550|NRD-SALM0299:0.8550|NRD-CHIC0020:0.8550,abstain_miss
+NRD-T-0039,nordic,CUST-003,2026-04-17,Nordvik 5kg,,,,review,,0.8550,ambiguous_margin,NRD-CHIC0468:0.8550|NRD-PUFF0078:0.8550|NRD-CHIC0253:0.8550,abstain_ok
+NRD-T-0040,nordic,CUST-004,2026-05-13,Epson 003 ink black bottle,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0041,nordic,CUST-007,2026-07-02,subtotal,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0042,nordic,CUST-002,2026-04-14,Halberg/Chicken/Breast/Strips/10kg,,,NRD-CHIC0411,auto,NRD-CHIC0411,1.0000,lexical_unique,NRD-CHIC0411:1.0000|NRD-CHIC0180:0.8657|NRD-CHIC0036:0.8550,auto_correct
+NRD-T-0043,nordic,CUST-003,2026-08-17,Halberg Prawnn 16/0 2kg,,,NRD-PRAW0129,auto,NRD-PRAW0129,0.9565,lexical_unique,NRD-PRAW0129:0.9565|NRD-PRAW0210:0.9130|NRD-PRAW0385:0.8696,auto_correct
+NRD-T-0044,nordic,CUST-002,2026-07-05,- sisu squid ring raw 1kg,,,NRD-SQUI0393,auto,NRD-SQUI0393,1.0000,lexical_unique,NRD-SQUI0393:1.0000|NRD-SQUI0155:0.8800,auto_correct
+NRD-T-0045,nordic,CUST-005,2026-08-25,Cape/Bay/mentega/Unsalted/Block/5kg,,,NRD-BUTT0273,review,,0.8696,no_candidate_above_floor,NRD-BUTT0273:0.8696,abstain_miss
+NRD-T-0046,nordic,CUST-004,2026-07-25,Vanilla Ice Tub,,,,review,,0.8550,ambiguous_margin,NRD-VANI0424:0.8550|NRD-VANI0460:0.8550|NRD-VANI0363:0.8550,abstain_ok
+NRD-T-0047,nordic,CUST-004,2026-08-18,Halberg Mozzarella 2kg,,,,review,,0.9500,ambiguous_margin,NRD-MOZZ0286:0.9500|NRD-MOZZ0054:0.9500|NRD-MOZZ0065:0.9500,abstain_ok
+NRD-T-0048,nordic,CUST-003,2026-04-06,Halberg - Chicken - Breast - Strips - 5kg - (Bulk) - x6,,,NRD-CHIC0167B,auto,NRD-CHIC0167B,0.9500,lexical_unique,NRD-CHIC0167B:0.9500,auto_correct
+NRD-T-0049,nordic,CUST-008,2026-06-23,Puff 2kg,NRD-MOZZ0487,,NRD-PUFF0244B,auto,NRD-PUFF0244B,1.0000,alias_exact,NRD-PUFF0244B:1.0000,auto_correct
+NRD-T-0050,nordic,CUST-003,2026-08-16,Sisu - Beef - Patty - 150g - 24s,,,NRD-BEEF0228,auto,NRD-BEEF0228,0.9500,lexical_unique,NRD-BEEF0228:0.9500|NRD-BEEF0270:0.8740|NRD-BEEF0255:0.8740,auto_correct
+NRD-T-0051,nordic,CUST-007,2026-04-21,Puff - Pastry - Sheet - 5kg,007184961,,NRD-PUFF0078,review,,0.9068,ambiguous_margin,NRD-PUFF0222:0.9068|NRD-PUFF0429:0.9068|NRD-PUFF0340:0.9068,abstain_miss
+NRD-T-0052,nordic,CUST-005,2026-06-16,Halberg Breast Strips 5kg,,,,review,,0.9500,ambiguous_twins,NRD-CHIC0167:0.9500|NRD-CHIC0167B:0.8550|NRD-CHIC0184:0.7953,abstain_ok
+NRD-T-0053,nordic,CUST-006,2026-07-23,Nescafe Gold refill 170g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0054,nordic,CUST-004,2026-07-05,Makita LS1040 mitre saw 240v,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0055,nordic,CUST-006,2026-06-05,Golden Pantry Mozzarella Block 1kg,,,NRD-MOZZ0122,auto,NRD-MOZZ0122,1.0000,lexical_unique,NRD-MOZZ0122:1.0000|NRD-MOZZ0356:0.8824|NRD-MOZZ0415:0.8581,auto_correct
+NRD-T-0056,nordic,CUST-003,2026-06-24,Fjordal - PPPuff - Pastry - Block - 1kg,,,NRD-PUFF0166,review,,0.8887,no_candidate_above_floor,NRD-PUFF0166:0.8887|NRD-PRAW0206:0.8550|NRD-PRAW0461:0.8550,abstain_miss
+NRD-T-0057,nordic,CUST-007,2026-07-23,need Fjordal Bee fPatty 100g  24s,,,NRD-BEEF0214,review,,0.9630,ambiguous_twins,NRD-BEEF0214:0.9630|NRD-BEEF0395:0.9259|NRD-BEEF0165:0.9259,abstain_miss
+NRD-T-0058,nordic,CUST-003,2026-06-22,nordvik vanilla ice cream tub 4l,,,NRD-VANI0213,auto,NRD-VANI0213,1.0000,lexical_unique,NRD-VANI0213:1.0000|NRD-VANI0424:0.9688|NRD-VANI0148:0.9375,auto_correct
+NRD-T-0059,nordic,CUST-001,2026-05-13,Sisu  Puff  Pastry  Sheet  2kg,,,NRD-PUFF0353,auto,NRD-PUFF0353,1.0000,lexical_unique,NRD-PUFF0353:1.0000|NRD-PUFF0297:0.8261,auto_correct
+NRD-T-0060,nordic,CUST-005,2026-05-18,Halberg Puff 1kg,,,,review,,0.8550,ambiguous_twins,NRD-SQUI0021:0.8550|NRD-MOZZ0136:0.8550|NRD-SQUI0106:0.8550,abstain_ok
+NRD-T-0061,nordic,CUST-001,2026-05-26,Fjordal Potato Fries Wedge 2.5kg x24 box,,,NRD-POTA0086,auto,NRD-POTA0086,0.9500,lexical_unique,NRD-POTA0086:0.9500|NRD-POTA0238:0.8821|NRD-POTA0151:0.8667,auto_correct
+NRD-T-0062,nordic,CUST-001,2026-08-15,1) Cape Bay Mozzarella Diced 2kg,,,NRD-MOZZ0035,auto,NRD-MOZZ0035,0.9667,lexical_unique,NRD-MOZZ0035:0.9667|NRD-MOZZ0152:0.8571|NRD-MOZZ0109:0.8404,auto_correct
+NRD-T-0063,nordic,CUST-004,2026-05-11,Cape - Bay - Prawn - 31/40 - 1kg,,,NRD-PRAW0260,auto,NRD-PRAW0260,0.9500,lexical_unique,NRD-PRAW0260:0.9500|NRD-PRAW0285:0.8550|NRD-PRAW0025:0.8360,auto_correct
+NRD-T-0064,nordic,CUST-006,2026-05-08,-/Cape/Bay/Prawn/2kg,,949932661192,NRD-PRAW0140,auto,NRD-PRAW0140,1.0000,barcode_hit,NRD-PRAW0140:1.0000,auto_correct
+NRD-T-0065,nordic,CUST-003,2026-07-01,Fjordal Breast Whole,003508914,,NRD-CHIC0324,review,,0.8550,ambiguous_twins,NRD-CHIC0406:0.8550|NRD-CHIC0324:0.8550|NRD-CHIC0452:0.8550,abstain_miss
+NRD-T-0066,nordic,CUST-002,2026-07-24,Nordvik Salmon Fillet Portion 5kg,,,,review,,1.0000,ambiguous_twins,NRD-SALM0142:1.0000|NRD-SALM0142B:0.9500|NRD-SALM0100:0.8636,abstain_ok
+NRD-T-0067,nordic,CUST-007,2026-06-22,Nescafe Gold refill 170g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0068,nordic,CUST-001,2026-06-18,thanks bro,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0069,nordic,CUST-004,2026-08-24,- Halberg Potato Fries Wedge 2.5kg,,,NRD-POTA0231,auto,NRD-POTA0231,1.0000,lexical_unique,NRD-POTA0231:1.0000|NRD-POTA0438:0.8821|NRD-POTA0293:0.8667,auto_correct
+NRD-T-0070,nordic,CUST-004,2026-06-25,need Haberg Prawn PDTO 1kkg,,,NRD-PRAW0266,review,,0.9545,ambiguous_twins,NRD-PRAW0266:0.9545|NRD-PRAW0237:0.9091,abstain_miss
+NRD-T-0071,nordic,CUST-007,2026-06-22,HALBERG FC MILK FRESH 200ML,,,NRD-FULL0121,review,,0.8941,no_candidate_above_floor,NRD-FULL0121:0.8941|NRD-FULL0041:0.8136|NRD-FULL0104:0.7797,abstain_miss
+NRD-T-0072,nordic,CUST-004,2026-07-21,golden pantry potato fries wedge 1kg,,,NRD-POTA0234,auto,NRD-POTA0234,1.0000,lexical_unique,NRD-POTA0234:1.0000|NRD-POTA0391:0.8906|NRD-POTA0188:0.8769,auto_correct
+NRD-T-0073,nordic,CUST-008,2026-06-23,item: Sisu mentega Unsalted Sheet 5kg,,,NRD-BUTT0032,review,,0.8525,no_candidate_above_floor,NRD-BUTT0032:0.8525,abstain_miss
+NRD-T-0074,nordic,CUST-005,2026-08-11,- Nordvik Puff Pastry Sheet 5kg,,,NRD-PUFF0078,auto,NRD-PUFF0078,1.0000,lexical_unique,NRD-PUFF0078:1.0000|NRD-PUFF0296:0.8404,auto_correct
+NRD-T-0075,nordic,CUST-004,2026-04-28,Golden Pantry Vanilla Ice Cream Tub 1L x24 doz,,,NRD-VANI0480,auto,NRD-VANI0480,0.9500,lexical_unique,NRD-VANI0480:0.9500|NRD-VANI0263:0.9110|NRD-VANI0427:0.9110,auto_correct
+NRD-T-0076,nordic,CUST-006,2026-07-02,Sisu Beef Patty 150g 48s,,,NRD-BEEF0270,auto,NRD-BEEF0270,1.0000,lexical_unique,NRD-BEEF0270:1.0000|NRD-BEEF0228:0.9583|NRD-BEEF0255:0.9167,auto_correct
+NRD-T-0077,nordic,CUST-002,2026-07-12,Nordvik Salmon Fillet Side 3kg,,,NRD-SALM0386,auto,NRD-SALM0386,1.0000,lexical_unique,NRD-SALM0386:1.0000|NRD-SALM0004:0.9032|NRD-SALM0414:0.8636,auto_correct
+NRD-T-0078,nordic,CUST-007,2026-05-09,Fjordal Chicken Whole,007762430,,NRD-CHIC0324,review,,0.8550,ambiguous_twins,NRD-CHIC0406:0.8550|NRD-CHIC0313:0.8550|NRD-CHIC0324:0.8550,abstain_miss
+NRD-T-0079,nordic,CUST-007,2026-05-19,Salmon Portion 5kg,,,,review,,0.8550,ambiguous_twins,NRD-SALM0449:0.8550|NRD-SALM0142:0.8550|NRD-SALM0117:0.8550,abstain_ok
+NRD-T-0080,nordic,CUST-004,2026-06-21,Salmon Fillet Portion,,,,review,,0.9500,ambiguous_twins,NRD-SALM0449:0.9500|NRD-SALM0389:0.9500|NRD-SALM0064:0.9500,abstain_ok
+NRD-T-0081,nordic,CUST-007,2026-06-27,Duracell AA battery 8 pack,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0082,nordic,CUST-008,2026-08-25,Halberg Prawn 31/40 1kg,,,NRD-PRAW0160,auto,NRD-PRAW0160,1.0000,lexical_unique,NRD-PRAW0160:1.0000|NRD-PRAW0141:0.9130|NRD-PRAW0308:0.8696,auto_correct
+NRD-T-0083,nordic,CUST-008,2026-04-20,Norvik Squd Ring Breaded 2kg,,,NRD-SQUI0397,auto,NRD-SQUI0397,0.9655,lexical_unique,NRD-SQUI0397:0.9655|NRD-SQUI0282:0.8519,auto_correct
+NRD-T-0084,nordic,CUST-008,2026-05-17,Sisu Pottao Fries Wedge 25.kg,,,NRD-POTA0128,review,,0.9310,ambiguous_twins,NRD-POTA0128:0.9310|NRD-POTA0173:0.8929|NRD-POTA0474:0.7857,abstain_miss
+NRD-T-0085,nordic,CUST-005,2026-04-24,nordvik FC MILK uht 2l,,,NRD-FULL0462,review,,0.8805,ambiguous_margin,NRD-FULL0462:0.8805|NRD-FULL0287:0.8550|NRD-FULL0348:0.8550,abstain_miss
+NRD-T-0086,nordic,CUST-001,2026-04-14,Fjordal - Vanilla - Ice - Cream - Tub - 6s,,,NRD-VANI0479,auto,NRD-VANI0479,0.9500,lexical_unique,NRD-VANI0479:0.9500|NRD-VANI0243:0.9033|NRD-VANI0327:0.9033,auto_correct
+NRD-T-0087,nordic,CUST-008,2026-07-26,Nordvik 16/20 1kg,,,NRD-PRAW0198,auto,NRD-PRAW0198,0.9500,lexical_unique,NRD-PRAW0198:0.9500|NRD-SALM0299:0.8550|NRD-SQUI0112:0.8550,auto_correct
+NRD-T-0088,nordic,CUST-005,2026-08-21,Halberg/Beef/Patty/200g/48s/x48,,,NRD-BEEF0161,auto,NRD-BEEF0161,0.9500,lexical_unique,NRD-BEEF0161:0.9500|NRD-BEEF0279:0.8966|NRD-BEEF0185:0.8740,auto_correct
+NRD-T-0089,nordic,CUST-003,2026-04-26,urgent Salmon Fillet Trim D 3kg,003047358,,NRD-SALM0413,auto,NRD-SALM0413,1.0000,alias_exact,NRD-SALM0413:1.0000,auto_correct
+NRD-T-0090,nordic,CUST-004,2026-04-04,MOZZARELLA 2KG,004746404,,NRD-MOZZ0205,auto,NRD-MOZZ0205,1.0000,alias_exact,NRD-MOZZ0205:1.0000,auto_correct
+NRD-T-0091,nordic,CUST-002,2026-04-11,Nordvik Block 1kg,,914887099891,NRD-MOZZ0357,auto,NRD-MOZZ0357,1.0000,barcode_hit,NRD-MOZZ0357:1.0000,auto_correct
+NRD-T-0092,nordic,CUST-001,2026-06-14,urgent Breast Whole 2kg,001784863,,NRD-CHIC0324,reject,,0.0000,brand_not_in_tenant,,abstain_miss
+NRD-T-0093,nordic,CUST-004,2026-05-21,Cape Bay Puff Pastry Sheet 2kg,,,,review,,1.0000,ambiguous_twins,NRD-PUFF0244:1.0000|NRD-PUFF0244B:0.9500|NRD-PUFF0305:0.8444,abstain_ok
+NRD-T-0094,nordic,CUST-004,2026-08-05,Nescafe Gold refill 170g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0095,nordic,CUST-005,2026-07-15,ATTN: purchasing dept,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0096,nordic,CUST-005,2026-05-04,Golden Pantry Butter Unsalted Sheet 500g,,,NRD-BUTT0312,auto,NRD-BUTT0312,1.0000,lexical_unique,NRD-BUTT0312:1.0000|NRD-BUTT0271:0.8750,auto_correct
+NRD-T-0097,nordic,CUST-003,2026-05-01,Halberg Butter Unsalted BBock 500g,,,NRD-BUTT0211,auto,NRD-BUTT0211,0.9706,lexical_unique,NRD-BUTT0211:0.9706|NRD-BUTT0302:0.8581,auto_correct
+NRD-T-0098,nordic,CUST-002,2026-08-09,cape  bay  mozzarella  diced  1kg,,,NRD-MOZZ0110,auto,NRD-MOZZ0110,1.0000,lexical_unique,NRD-MOZZ0110:1.0000|NRD-MOZZ0400:0.8852|NRD-MOZZ0221:0.8621,auto_correct
+NRD-T-0099,nordic,CUST-003,2026-04-28,need fjordal puff pastry sheet 1kg,,,NRD-PUFF0316,auto,NRD-PUFF0316,1.0000,lexical_unique,NRD-PUFF0316:1.0000|NRD-PUFF0166:0.8404,auto_correct
+NRD-T-0100,nordic,CUST-007,2026-07-24,Golden Pantry ayam Breast Strips 1kg,,,NRD-CHIC0310,auto,NRD-CHIC0310,1.0000,lexical_unique,NRD-CHIC0310:1.0000|NRD-CHIC0134:0.8831|NRD-CHIC0289:0.8686,auto_correct
+NRD-T-0101,nordic,CUST-006,2026-06-27,Full - Milk - 1L,,,,review,,0.8550,ambiguous_twins,NRD-FULL0203:0.8550|NRD-FULL0267:0.8550|NRD-FULL0177:0.8550,abstain_ok
+NRD-T-0102,nordic,CUST-005,2026-07-06,Sisu Prawn 16/20 2kg x12 bag,,,NRD-PRAW0376,auto,NRD-PRAW0376,0.9500,lexical_unique,NRD-PRAW0376:0.9500|NRD-PRAW0291:0.8061|NRD-PRAW0062:0.7824,auto_correct
+NRD-T-0103,nordic,CUST-004,2026-07-26,SISU MOZZARELLA,004263645,,NRD-MOZZ0458,review,,0.5500,alias_low_trust,NRD-MOZZ0458:0.5500,abstain_miss
+NRD-T-0104,nordic,CUST-001,2026-05-22,Pantry Mozzarella Block 2kg,,903993133140,NRD-MOZZ0031,auto,NRD-MOZZ0031,1.0000,barcode_hit,NRD-MOZZ0031:1.0000,auto_correct
+NRD-T-0105,nordic,CUST-003,2026-08-09,Nordvik - Pastry - 5kg,003306026,,NRD-PUFF0078,review,,0.9000,ambiguous_twins,NRD-PUFF0078:0.9000|NRD-PUFF0296:0.9000|NRD-SALM0142B:0.8550,abstain_miss
+NRD-T-0106,nordic,CUST-006,2026-05-23,Fjordal Beef Patty 200g,006413663,,NRD-BEEF0259,review,,0.9500,ambiguous_margin,NRD-BEEF0118:0.9500|NRD-BEEF0259:0.9500|NRD-BEEF0351:0.9500,abstain_miss
+NRD-T-0107,nordic,CUST-001,2026-06-15,Salmon Fillet 1kg,,,,review,,0.8550,ambiguous_margin,NRD-SALM0299:0.8550|NRD-SALM0130:0.8550|NRD-SALM0218:0.8550,abstain_ok
+NRD-T-0108,nordic,CUST-002,2026-06-09,Wagyu striploin MB7 grain fed,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0109,nordic,CUST-002,2026-08-09,pls confirm stock first,,,,review,,0.0000,no_candidate_above_floor,,abstain_ok
+NRD-T-0110,nordic,CUST-002,2026-04-09,1) Golden Pantry Salmon Fillet Portion 5kg,,,NRD-SALM0095,auto,NRD-SALM0095,0.9750,lexical_unique,NRD-SALM0095:0.9750|NRD-SALM0114:0.8791|NRD-SALM0276:0.8608,auto_correct
+NRD-T-0111,nordic,CUST-005,2026-08-02,Nordvik Chickenn Breas Diced 10kg,,,NRD-CHIC0269,auto,NRD-CHIC0269,0.9697,lexical_unique,NRD-CHIC0269:0.9697|NRD-CHIC0162:0.8485|NRD-CHIC0197:0.8358,auto_correct
+NRD-T-0112,nordic,CUST-002,2026-08-23,Fjordal Puff Pastry Sheet 1Kg,,,NRD-PUFF0316,auto,NRD-PUFF0316,1.0000,lexical_unique,NRD-PUFF0316:1.0000|NRD-PUFF0166:0.8404,auto_correct
+NRD-T-0113,nordic,CUST-002,2026-07-12,Golden Pantry udang 16/20 2kg,,,NRD-PRAW0053,review,,0.8966,no_candidate_above_floor,NRD-PRAW0053:0.8966|NRD-PRAW0435:0.8276|NRD-PRAW0475:0.8276,abstain_miss
+NRD-T-0114,nordic,CUST-004,2026-06-06,Sisu Chicken 5kg,,,,review,,0.8550,ambiguous_margin,NRD-SALM0449:0.8550|NRD-BUTT0059:0.8550|NRD-CHIC0365:0.8550,abstain_ok
+NRD-T-0115,nordic,CUST-005,2026-07-02,urgent Halberg Full Cream Milk Fresh 1L x48,,,NRD-FULL0104,auto,NRD-FULL0104,0.9500,lexical_unique,NRD-FULL0104:0.9500|NRD-FULL0041:0.9033|NRD-FULL0177:0.8821,auto_correct
+NRD-T-0116,nordic,CUST-006,2026-05-14,Sisu Full Cream Milk UHT 200ml x6,,,NRD-FULL0024,auto,NRD-FULL0024,0.9524,lexical_unique,NRD-FULL0024:0.9524|NRD-FULL0420:0.9000|NRD-FULL0028:0.8941,auto_correct
+NRD-T-0117,nordic,CUST-007,2026-05-07,Fjordal Mozzarella Shredded,007049218,,NRD-MOZZ0143,auto,NRD-MOZZ0143,1.0000,alias_exact,NRD-MOZZ0143:1.0000,auto_correct
+NRD-T-0118,nordic,CUST-008,2026-06-16,- Halberg Full Cream Milk UHT 200ml,,,NRD-FULL0070,auto,NRD-FULL0070,1.0000,lexical_unique,NRD-FULL0070:1.0000|NRD-FULL0147:0.9524|NRD-FULL0177:0.9206,auto_correct
+NRD-T-0119,nordic,CUST-006,2026-05-06,Potato Fries 10mm 1kg,006182545,,NRD-POTA0156,review,,0.9500,ambiguous_margin,NRD-POTA0017:0.9500|NRD-POTA0208:0.9500|NRD-POTA0371:0.9500,abstain_miss
+NRD-T-0120,nordic,CUST-003,2026-04-06,Pantry Milk,,,,review,,0.8550,ambiguous_twins,NRD-FULL0120:0.8550|NRD-FULL0203:0.8550|NRD-FULL0267:0.8550,abstain_ok
+NRD-T-0121,nordic,CUST-005,2026-07-10,Makita LS1040 mitre saw 240v,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0122,nordic,CUST-006,2026-05-04,deliver by friday please,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0123,nordic,CUST-004,2026-07-20,Cape - Bay - Prawn - PDTO - 2kg,,,NRD-PRAW0226,auto,NRD-PRAW0226,0.9500,lexical_unique,NRD-PRAW0226:0.9500|NRD-PRAW0450:0.8143,auto_correct
+NRD-T-0124,nordic,CUST-005,2026-04-23,Nordvik Potato Freis 7mmm 2.5kg,,,NRD-POTA0163,auto,NRD-POTA0163,0.9508,lexical_unique,NRD-POTA0163:0.9508|NRD-POTA0295:0.9032|NRD-POTA0103:0.8254,auto_correct
+NRD-T-0125,nordic,CUST-008,2026-07-27,SiusSalmon Fillet Portion 1kg (Bulk),,,NRD-SALM0064B,auto,NRD-SALM0064B,0.9565,lexical_unique,NRD-SALM0064B:0.9565|NRD-SALM0405B:0.8333,auto_correct
+NRD-T-0126,nordic,CUST-001,2026-04-15,fjordal FC MILK fresh 2l,,,NRD-FULL0338,review,,0.8867,no_candidate_above_floor,NRD-FULL0338:0.8867|NRD-FULL0290:0.8214|NRD-FULL0416:0.8143,abstain_miss
+NRD-T-0127,nordic,CUST-004,2026-05-19,Fjordal udang 31/40 2kg,,,NRD-PRAW0224,review,,0.8696,no_candidate_above_floor,NRD-PRAW0224:0.8696|NRD-PRAW0275:0.7826,abstain_miss
+NRD-T-0128,nordic,CUST-006,2026-04-13,1) Halberg Unsalted Sheet 5kg,,,NRD-BUTT0321,review,,0.9148,ambiguous_twins,NRD-BUTT0321:0.9148|NRD-BUTT0194:0.7917,abstain_miss
+NRD-T-0129,nordic,CUST-006,2026-06-23,Cape Bay Full Cream Milk UHT 1L x12,,,NRD-FULL0323,auto,NRD-FULL0323,0.9500,lexical_unique,NRD-FULL0323:0.9500|NRD-FULL0432:0.9091|NRD-FULL0456:0.8696,auto_correct
+NRD-T-0130,nordic,CUST-006,2026-04-28,BAY PATTY 150G 48S,006284601,,NRD-BEEF0445,auto,NRD-BEEF0445,1.0000,alias_exact,NRD-BEEF0445:1.0000,auto_correct
+NRD-T-0131,nordic,CUST-008,2026-04-27,need Sisu Chicken Breast Diced 5kg,,,NRD-CHIC0101,auto,NRD-CHIC0101,1.0000,lexical_unique,NRD-CHIC0101:1.0000|NRD-CHIC0248:0.8621|NRD-CHIC0365:0.8475,auto_correct
+NRD-T-0132,nordic,CUST-003,2026-04-28,Sisu Prawn 1kg,003119277,,NRD-PRAW0099,review,,0.9500,ambiguous_margin,NRD-PRAW0285:0.9500|NRD-PRAW0387:0.9500|NRD-PRAW0099:0.9500,abstain_miss
+NRD-T-0133,nordic,CUST-004,2026-07-15,Fjordal Breast Whole 2kg,004770628,,NRD-CHIC0324,auto,NRD-CHIC0324,0.9500,lexical_unique,NRD-CHIC0324:0.9500|NRD-CHIC0490:0.8143|NRD-CHIC0107:0.8143,auto_correct
+NRD-T-0134,nordic,CUST-004,2026-06-13,Sisu Salmon Fillet D 5kg,,,,review,,0.9500,ambiguous_twins,NRD-SALM0331:0.9500|NRD-SALM0331B:0.9500|NRD-SALM0457:0.9412,abstain_ok
+NRD-T-0135,nordic,CUST-001,2026-06-04,Cadbury Dairy Milk 165g,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0136,nordic,CUST-003,2026-07-14,pls confirm stock first,,,,review,,0.0000,no_candidate_above_floor,,abstain_ok
+NRD-T-0137,nordic,CUST-006,2026-06-08,Sisu Puff Pastry Block 5kg,,,NRD-PUFF0068,auto,NRD-PUFF0068,1.0000,lexical_unique,NRD-PUFF0068:1.0000|NRD-PUFF0222:0.8261,auto_correct
+NRD-T-0138,nordic,CUST-002,2026-05-26,Siu Full Cream Mik UHT 2L,,,NRD-FULL0420,auto,NRD-FULL0420,0.9615,lexical_unique,NRD-FULL0420:0.9615|NRD-FULL0028:0.9231|NRD-FULL0024:0.9091,auto_correct
+NRD-T-0139,nordic,CUST-004,2026-07-11,1) NORDVIK CHK BRST WHOLE 2KG,,,NRD-CHIC0172,review,,0.8667,no_candidate_above_floor,NRD-CHIC0172:0.8667,abstain_miss
+NRD-T-0140,nordic,CUST-007,2026-04-18,Sisu mentega Unsalted Sheet 500g,,,NRD-BUTT0421,review,,0.8571,no_candidate_above_floor,NRD-BUTT0421:0.8571,abstain_miss
+NRD-T-0141,nordic,CUST-008,2026-05-09,Halberg Beef Patty 150g 12s,,,NRD-BEEF0019,auto,NRD-BEEF0019,1.0000,lexical_unique,NRD-BEEF0019:1.0000|NRD-BEEF0333:0.9630|NRD-BEEF0014:0.9259,auto_correct
+NRD-T-0142,nordic,CUST-007,2026-04-21,Nordvik Ice Tub 6s,,,NRD-VANI0148,review,,0.8550,ambiguous_margin,NRD-VANI0424:0.8550|NRD-VANI0363:0.8550|NRD-VANI0042:0.8550,abstain_miss
+NRD-T-0143,nordic,CUST-003,2026-04-27,Sisu/Beef/Patty/150g/12s/x24,,,NRD-BEEF0255,auto,NRD-BEEF0255,0.9500,lexical_unique,NRD-BEEF0255:0.9500|NRD-BEEF0228:0.8846|NRD-BEEF0270:0.8636,auto_correct
+NRD-T-0144,nordic,CUST-006,2026-07-21,pls send Fjordal Full Cream Milk UHT 2L,,,NRD-FULL0182,auto,NRD-FULL0182,0.9500,lexical_unique,NRD-FULL0182:0.9500|NRD-FULL0339:0.9000|NRD-FULL0280:0.8550,auto_correct
+NRD-T-0145,nordic,CUST-003,2026-07-25,Nordvik Salmon Fillet Trim D 1kg,,,NRD-SALM0299,auto,NRD-SALM0299,1.0000,lexical_unique,NRD-SALM0299:1.0000|NRD-SALM0350:0.9032|NRD-SALM0027:0.8615,auto_correct
+NRD-T-0146,nordic,CUST-003,2026-07-15,urgent/Nordvik/Puff/Sheet/5kg,003207325,,NRD-PUFF0078,review,,0.8196,no_candidate_above_floor,NRD-PUFF0078:0.8196,abstain_miss
+NRD-T-0147,nordic,CUST-008,2026-07-06,Ring Breaded 1kg,,,,review,,0.9000,ambiguous_twins,NRD-SQUI0155:0.9000|NRD-SQUI0021:0.9000|NRD-SQUI0023:0.9000,abstain_ok
+NRD-T-0148,nordic,CUST-001,2026-07-12,Copper pipe 22mm x 3m Class 2,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0149,nordic,CUST-001,2026-05-14,Duracell AA battery 8 pack,,,,reject,,0.0000,brand_not_in_tenant,,abstain_ok
+NRD-T-0150,nordic,CUST-002,2026-07-11,Cape Bay Vanilla Ice Cream Tub 6s,,,NRD-VANI0460,auto,NRD-VANI0460,1.0000,lexical_unique,NRD-VANI0460:1.0000|NRD-VANI0283:0.9394|NRD-VANI0242:0.9394,auto_correct
+NRD-T-0151,nordic,CUST-007,2026-07-02,Fjrdal    Vanilla  Ice  Cream  Tub  4L,,,NRD-VANI0327,auto,NRD-VANI0327,0.9841,lexical_unique,NRD-VANI0327:0.9841|NRD-VANI0243:0.9524|NRD-VANI0479:0.9206,auto_correct
+NRD-T-0152,nordic,CUST-005,2026-06-17,Sisu Samlon Fillet Trim D 5kg ((Bulk),,,NRD-SALM0331B,auto,NRD-SALM0331B,0.9706,lexical_unique,NRD-SALM0331B:0.9706,auto_correct
+NRD-T-0153,nordic,CUST-006,2026-06-01,Golden Pantry Beef Patty 200G 12S,,,NRD-BEEF0046,auto,NRD-BEEF0046,1.0000,lexical_unique,NRD-BEEF0046:1.0000|NRD-BEEF0261:0.9697|NRD-BEEF0081:0.9394,auto_correct
+NRD-T-0154,nordic,CUST-001,2026-06-11,1) Halberg Potato Fries 10mm 1kg,,,NRD-POTA0156,auto,NRD-POTA0156,0.9667,lexical_unique,NRD-POTA0156:0.9667,auto_correct
+NRD-T-0155,nordic,CUST-007,2026-06-22,Golden Pantry Squid Breaded 2kg,,,NRD-SQUI0488,auto,NRD-SQUI0488,0.9500,lexical_unique,NRD-SQUI0488:0.9500|NRD-SQUI0149:0.8254,auto_correct
+NRD-T-0156,nordic,CUST-006,2026-06-18,Fjordal Prawn PDTO 1kg x24 case,,,NRD-PRAW0461,auto,NRD-PRAW0461,0.9500,lexical_unique,NRD-PRAW0461:0.9500|NRD-PRAW0206:0.8075|NRD-PRAW0318:0.8075,auto_correct
+NRD-T-0157,nordic,CUST-003,2026-05-05,butter sheet 5kg,003404338,,NRD-BUTT0092,review,,0.5500,alias_low_trust,NRD-BUTT0092:0.5500,abstain_miss
+NRD-T-0158,nordic,CUST-006,2026-08-25,Cape Bay Prawn 16/20 2kg,,,NRD-PRAW0055,auto,NRD-PRAW0055,1.0000,lexical_unique,NRD-PRAW0055:1.0000|NRD-PRAW0450:0.9167|NRD-PRAW0140:0.9167,auto_correct
+NRD-T-0159,nordic,CUST-002,2026-04-25,Nordvik Potato Fries Crinkle 2.5kg,,,NRD-POTA0443,auto,NRD-POTA0443,1.0000,lexical_unique,NRD-POTA0443:1.0000|NRD-POTA0163:0.8821|NRD-POTA0295:0.8667,auto_correct
+NRD-T-0160,nordic,CUST-001,2026-08-19,Fjordal Breast Whole,001174007,,NRD-CHIC0324,review,,0.8550,ambiguous_twins,NRD-CHIC0406:0.8550|NRD-CHIC0324:0.8550|NRD-CHIC0452:0.8550,abstain_miss

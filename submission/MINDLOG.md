@@ -183,6 +183,7 @@ Use when building / editing DESIGN later:
 | 2026-10-13/14 slice 3     | Attr extract + twin/bulk filter; precision dipped; blank-GT FP class        |
 | 2026-10-14 blank-GT FPs   | 17 exact-name `auto_wrong`; lean Option D — keep auto, explain in EVAL      |
 | 2026-10-14 brand soft     | Drop denylist/`_PRODUCT_START`; catalogue exact+fuzzy; foreign=weak item   |
+| 2026-10-14 item phrase    | Catalogue leaf + brand-stripped name shortlist before attrs                |
 
 
 ---
@@ -334,7 +335,36 @@ Use when building / editing DESIGN later:
 
 Slightly more coverage; foreign rejects fewer (less hardcoded). Blank-GT Option D unchanged. Debug CSV: `submission/debug/train_smoke_*.csv` (fallback if Excel locks `train_smoke.csv`).
 
-**Still hardcoded (next):** global attr regexes; family = substring of `item_group` leaf (OK-ish, catalogue-derived). Item-phrase retrieval not rewritten yet.
+**Still open then:** item-phrase shortlist (done below); attr regexes still global (acceptable v1 — values mined from text/names, not tenant product lists).
+
+### 2026-10-14 — Item phrase shortlist (catalogue-derived)
+
+**Shipped:** `matcher/phrases.py` + text lane order now:
+
+```text
+brand soft → phrase shortlist (leaf + brand-stripped name) → attrs/twins → full-name fuzz decide
+```
+
+- Phrase key = brand-stripped `item_name`, with `item_group` leaf prepended when it adds tokens
+- Query brand tokens stripped before phrase match
+- If any catalogue leaf appears in query → prefer that family (no hand product list)
+- `PHRASE_FLOOR=0.65`, top 15 → attrs run **only** on that shortlist
+- Removed old `_family_narrow`-then-attrs-on-whole-family path
+
+**Train smoke:**
+
+| | after brand soft | after item phrase |
+|---|---|---|
+| auto correct | 182 | **189** |
+| auto wrong | 18 | 18 |
+| precision | 0.910 | **0.913** |
+| coverage | 48% | **49%** |
+| `ambiguous_twins` | 127 | **88** |
+| net value | −19560 | **−19140** |
+
+Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refreshed: `submission/debug/train_smoke.csv`.
+
+**Spine status:** brand ✓ · item phrase ✓ · attrs last ✓ (regex extractors remain — not tenant-specific product lists).
 
 ### 2026-10-14 — Blank-GT `auto_wrong` (post-attrs smoke)
 
