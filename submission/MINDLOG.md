@@ -180,6 +180,8 @@ Use when building / editing DESIGN later:
 | Assessor pass §1–§2       | Precision bias; admit non-item residual risk; clarify cold start            |
 | 2026-10-13 slice 0+1      | Matcher scaffold + barcode/alias/ID arb under `submission/matcher/`         |
 | 2026-10-13 slice 2        | Text normalize + brand/family + RapidFuzz; soft oppose live                 |
+| 2026-10-13/14 slice 3     | Attr extract + twin/bulk filter; precision dipped; blank-GT FP class        |
+| 2026-10-14 blank-GT FPs   | 17 exact-name `auto_wrong`; lean Option D — keep auto, explain in EVAL      |
 
 
 ---
@@ -188,11 +190,11 @@ Use when building / editing DESIGN later:
 
 ## While building — checklist
 
-- [x] Implement lanes in the locked order *(attrs/twins still slice 3)*
+- [x] Implement lanes in the locked order *(ID + text + attrs; brand×item×attr rewrite still open)*
 - [x] Every terminal path has a stable `reason_code` *(for paths that exist)*
 - [x] Tenant filter on every catalogue/alias lookup
-- [ ] Train harness: precision on auto, coverage, net value, curve *(smoke only so far)*
-- [ ] After first train numbers: update `DECISIONS.md` evidence; adjust 0.72 if needed
+- [x] Train harness smoke + debug CSV (`scripts/run_train_smoke.py` → `debug/train_smoke.csv`)
+- [ ] Full EVAL curve + `DECISIONS.md` evidence; adjust 0.72 if needed
 - [x] Hand-check Cadbury, Stallion flap, one OLD-alias line, one duplicate-SKU case
 - [x] Keep this file updated when a lock changes (date + why)
 
@@ -272,6 +274,72 @@ Use when building / editing DESIGN later:
 **Tests:** 21 green.
 
 **Next:** slice 3 — attr extract + twin / bulk filter + retune τ/margin.
+
+### 2026-10-13/14 — Slice 3 (attrs + twins)
+
+**Shipped:**
+- `attrs.py` — extract size / finish / colour / grade / bulk from text + item_name; `item_matches_query`; `unspecified_attr_disagreement`
+- `lanes/text.py` — after brand/family: hard-filter pool by attrs the line stated → if remaining items disagree on an **unspecified** attr → `ambiguous_twins` → else RapidFuzz decide
+- pack qty `xN` ignored for SKU identity; explicit `(Bulk)` is a discriminator
+- twin regression tests in `tests/test_attrs.py`
+- smoke now exports `submission/debug/train_smoke.csv` (per-line decision + `outcome`)
+
+**Thresholds:** `AUTO_FLOOR=0.90`, `MARGIN=0.03`, `REVIEW_FLOOR=0.72`
+
+**Train smoke (slice 2 → slice 3):**
+
+| | slice 2 | slice 3 |
+|---|---|---|
+| auto correct | 125 | 176 |
+| auto wrong | 4 | **17** |
+| precision on auto | **0.969** | **0.912** |
+| coverage | ~31% | ~46% |
+| net value | **−12340** | **−19160** (worse) |
+| `ambiguous_twins` | — | 117 |
+| `ambiguous_margin` | 198 | 13 |
+
+**Original 4 FPs after slice 3:**
+
+| line | result | note |
+|---|---|---|
+| ACM-T-0066 Tolsen Bolt M8x50 | `review` / `ambiguous_twins` | fixed — finish underspec |
+| ACM-T-0134 … M8x50 HDG | `review` / `ambiguous_twins` | fixed — bulk twin |
+| NRD-T-0052 Breast Strips 5kg | `review` / `ambiguous_twins` | fixed — bulk twin |
+| ACM-T-0028 Stallion Ball Valve 1-1/4" PVC | still `auto` wrong | unique name; no twin to disagree |
+
+**Why wrong autos went 4 → 17:** attr filter removes near-siblings that used to create `ambiguous_margin`. Exact catalogue-name lines with **blank GT** then look unique @ 1.0 → `lexical_unique`. Twin policy worked; side effect unlocked blank-GT exact autos (see next note).
+
+**Honesty / next architecture (not coded yet):** current brand denylist + `_PRODUCT_START` + global attr regexes are **tenant-hardcoded** and won’t travel. Proposed spine (catalogue-derived):
+
+1. **Brand** vs tenant catalogue brands (exact + fuzzy typos); miss → brandless path, not auto-reject  
+2. **Item phrase** within that pool from `item_group` leaf + brand-stripped `item_name`  
+3. **Attrs last** on the shortlist only (discriminate twins)
+
+Evidence for brandless path: ~28 labelled train lines have no brand token but still have GT (`Cable Tie…`, `GI Wire…`, `PVC 20mm…`). Blank-brand catalogue rows are MISC only.
+
+**Paused here** — no further silent threshold tweaks; blank-GT policy locked below as Option D until EVAL.
+
+### 2026-10-14 — Blank-GT `auto_wrong` (post-attrs smoke)
+
+**What:** After attrs/twins, train smoke still has **17** `auto_wrong`. All blank `gt_item_code`, all `lexical_unique` @ 1.0, all exact catalogue `item_name` hits, no buyer_sku/barcode. Families: PVCP 7 / ANGL 4 / SELF 4 / NITR 1 / BALL 1.
+
+**(checked) Not the cause:**
+
+- UOM mismatch — vague `unit`/`ea`/`pcs` also on correct autos; when price present, **10/10** within 15% of `list_price` (no pack-price signal).
+- Twins / OOS — no bulk twin on these 17; `available_qty=0` not discriminative.
+- No feature separates blank-GT exact hits from labeled exact hits (same shape: **51 correct + 17 wrong = 68** no-ID exact lexical autos).
+
+**Decision options considered:**
+
+- **A** keep auto (accept train FPs)
+- **B** abstain that whole shape → kills 17 FPs but also ~51 TPs; train net on those 68 improves because −800 asymmetry
+- **C** raise floor/margin — useless here (already score 1.0)
+- **D** keep A’s policy + document in EVAL (inseparable label edge)
+- **E** UOM/price veto — rejected by data; out of DESIGN scope
+
+**Lean: Option D.** Keep exact unique text autos. Carry the 17 as known FP class into EVAL/error analysis: model matches the item; label says unmatchable; abstaining the shape is inseparable collateral. Revisit only if holdout shows a worse blank-exact rate or Product wants precision over coverage.
+
+**EVAL note to write later:** cite blank-GT policy from brief (~⅓ no correct answer); show inseparability counts; do not invent a gate without a separating signal.
 
 ---
 
