@@ -2,3 +2,9 @@
 # graders-only, never commit
 starter/make_dataset.py
 starter/score_predictions.py
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
