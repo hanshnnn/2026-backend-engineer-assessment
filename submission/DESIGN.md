@@ -43,20 +43,21 @@ Order of work: tenant first, then ID lanes, then text; final arbitration owns `a
 ```text
 order line
   │
-  ├─ (0) tenant scope          [deterministic]
+  ├─ (0) tenant scope          [deterministic — catalogue_<tenant>.csv discovery]
   ├─ (1) barcode lane          [deterministic]
-  ├─ (2) buyer_sku alias lane  [deterministic + trust gate]
+  ├─ (2) buyer_sku alias lane  [deterministic + uniqueness / in-date gate]
   ├─ (3) ID arbitration        [deterministic]
   │       barcode vs alias → id_id_conflict
   │       single ID auto → soft text oppose check
-  ├─ (4) text lane             [normalize + mostly deterministic retrieval;
-  │       brand / family         scoring is graded / thresholded]
-  │       attr extract + twin filter
+  │       OLD-only alias → auto only if live sibling ∈ text candidates
+  ├─ (4) text lane             [normalize + catalogue brand soft-filter →
+  │       phrase shortlist       leaf+name phrase shortlist (top 15 ≥ 0.65) →
+  │       attr + twin filter     required-attr filter & twin check → lexical score]
   └─ (5) final arbitration     [deterministic given scores]
           auto | review | reject + reason_code + candidates≤3
 ```
 
-**Stage contract.** Each stage either stops with `{decision, item_code?, confidence, reason_code, candidates}` or returns `continue` (optional shortlist). No stage may resolve outside the line’s `tenant`. Tenant comes from the `tenant` **field** (API / CSV column), never from parsing `line_id`.
+**Stage contract.** Each stage either stops with `{decision, item_code?, confidence, reason_code, candidates}` or returns `continue` (optional shortlist). No stage may resolve outside the line’s `tenant`. Tenant comes from the `tenant` **field** (API / CSV column), never from parsing `line_id`; any tenant without a loaded `catalogue_<tenant>.csv` is rejected (`unknown_tenant`).
 
 
 | Stage             | Deterministic?   | Why this order                                    |
@@ -116,10 +117,10 @@ Expensive mistakes are **confident wrong autos**. Common typos that abstain are 
 
 | #   | Failure                                                     | Catch                                                                                              | `reason_code` (typical)                               |
 | --- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| 1   | Auto on non-item / wrong-domain line (e.g. Cadbury on Acme) | ID lanes miss; text / final arb: denylist or no catalogue foothold → reject                        | `not_an_item` / `brand_not_in_tenant`                 |
+| 1   | Auto on non-item / wrong-domain line (e.g. Cadbury on Acme) | ID lanes miss; text checks non-item patterns or unrecognised brand token with weak lexical score (< 0.72) → reject | `not_an_item` / `brand_not_in_tenant`                 |
 | 2   | Twin / missing discriminator (size, class, finish, colour)  | Required-attr abstain when remaining candidates disagree on an omitted attr                        | `ambiguous_twins`                                     |
 | 3   | Superseded / disabled SKU (`*-OLD`, `disabled=1`)           | Drop inactive; unique `*-OLD` → strip to live sibling; **auto only if** that code ∈ text candidates; else fall through | `alias_old_successor` / lexical reason                |
-| 4   | Dirty alias: low conf, or duplicate buyer SKU → two codes   | After in-date + active filter: ≠1 code → review; conf < 0.72 → hard review; ≥ 0.72 + unique → auto | `ambiguous_alias` / `alias_low_trust` / `alias_exact` |
+| 4   | Dirty alias: duplicate buyer SKU → two active codes         | After in-date + active filter: ≥2 distinct codes → review; 1 unique active code → tentative auto (`ALIAS_AUTO_FLOOR=0.0`, reversal knob `alias_low_trust`) | `ambiguous_alias` / `alias_exact` (`alias_low_trust`) |
 | 5   | Cross-tenant resolution                                     | Every lookup tenant-scoped; buyer_sku shaped like `NRD-*` on Acme still maps only to Acme items    | (hard fail if violated)                               |
 | 6   | ID contradicts strong text (or barcode vs alias)            | Soft verify: unique strong text candidate ≠ ID → review; barcode≠alias → review                    | `id_text_conflict` / `id_id_conflict`                 |
 
@@ -142,9 +143,9 @@ Tenant catalogue barcode → active rows only. 0 hits → continue. ≥2 actives
 
 Key: `(tenant, customer_id, buyer_sku)`. Filter: `valid_from/valid_to` vs `order_date`; drop disabled/`*-OLD`.
 
-- ≥2 distinct codes left → `review` / `ambiguous_alias` (stop).
-- 1 code, `confidence >= 0.72` → tentative auto / `alias_exact` (source ignored; conf is the knob).
-- 1 code, `confidence < 0.72` → `review` / `alias_low_trust`, candidates = that code (stop).
+- ≥2 distinct active codes left → `review` / `ambiguous_alias` (stop).
+- 1 active code (`confidence >= ALIAS_AUTO_FLOOR`, set to `0.0` from train evidence — see `DECISIONS.md` D-01/D-02) → tentative auto / `alias_exact`.
+- (`alias_low_trust` retained in code if `ALIAS_AUTO_FLOOR` is raised above `0.0` for a noisier tenant).
 - Only superseded/expired/empty → strip unique `*-OLD` to active live code; if that code appears in text candidates → auto `alias_old_successor`; else **fall through** to text.
 
 
@@ -152,13 +153,13 @@ Key: `(tenant, customer_id, buyer_sku)`. Filter: `valid_from/valid_to` vs `order
 ### ID arbitration
 
 - Barcode auto and alias auto disagree → `review` / `id_id_conflict`.
-- Single ID auto `A`: cheap text oppose check — if text has a unique strong candidate `B ≠ A` → `review` / `id_text_conflict`; else auto with `barcode_hit` or `alias_exact`.
+- Single ID auto `A`: cheap text oppose check — if text has a unique strong candidate `B ≠ A` (`SOFT_OPPOSE_FLOOR = 0.90`, `MARGIN = 0.03`) → `review` / `id_text_conflict`; else auto with `barcode_hit` or `alias_exact`.
 
 
 
 ### Text
 
-Normalize → brand/family narrow (unknown foreign brand with no ID → refuse) → retrieve candidates → extract size / grade / finish / colour / bulk → required-attr filter → score → τ and margin.
+Normalize (synonyms + Malay/English tokens) → non-item check (`not_an_item`) → catalogue-derived brand soft-filter (exact / glued prefix / fuzzy ≥ 78; if none and leading brand-shaped token with top item score < 0.72 → `brand_not_in_tenant`) → item-phrase shortlist (`item_group` leaf + brand-stripped name, top 15 with score ≥ 0.65) → extract & filter attributes (size / grade / finish / colour / bulk) + twin ambiguity check (`ambiguous_twins`) → full-name score (`AUTO_FLOOR = 0.90`, `REVIEW_FLOOR = 0.72`, `MARGIN = 0.03`).
 
 “I don’t know” is first-class: missing attrs, thin margins, non-items, and trust failures all abstain **with reasons**, not only “score < τ”.
 

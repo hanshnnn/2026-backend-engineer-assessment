@@ -51,7 +51,6 @@ class MatchService:
     Tenant-scoped matcher.
 
     Slice 2: barcode → alias → (text retrieve for soft oppose) → ID arb → text decide.
-    Attr / twin filters still deferred to slice 3.
     """
 
     def __init__(self, catalogue: CatalogueIndex, aliases: AliasIndex) -> None:
