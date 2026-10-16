@@ -115,14 +115,14 @@ Deleting an embedding lane after a negative train result is an acceptable outcom
 Expensive mistakes are **confident wrong autos**. Common typos that abstain are cheap.
 
 
-| #   | Failure                                                     | Catch                                                                                              | `reason_code` (typical)                               |
-| --- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| 1   | Auto on non-item / wrong-domain line (e.g. Cadbury on Acme) | ID lanes miss; text checks non-item patterns or unrecognised brand token with weak lexical score (< 0.72) → reject | `not_an_item` / `brand_not_in_tenant`                 |
-| 2   | Twin / missing discriminator (size, class, finish, colour)  | Required-attr abstain when remaining candidates disagree on an omitted attr                        | `ambiguous_twins`                                     |
-| 3   | Superseded / disabled SKU (`*-OLD`, `disabled=1`)           | Drop inactive; unique `*-OLD` → strip to live sibling; **auto only if** that code ∈ text candidates; else fall through | `alias_old_successor` / lexical reason                |
+| #   | Failure                                                     | Catch                                                                                                                                                      | `reason_code` (typical)                               |
+| --- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 1   | Auto on non-item / wrong-domain line (e.g. Cadbury on Acme) | ID lanes miss; text checks non-item patterns or unrecognised brand token with weak lexical score (< 0.72) → reject                                         | `not_an_item` / `brand_not_in_tenant`                 |
+| 2   | Twin / missing discriminator (size, class, finish, colour)  | Required-attr abstain when remaining candidates disagree on an omitted attr                                                                                | `ambiguous_twins`                                     |
+| 3   | Superseded / disabled SKU (`*-OLD`, `disabled=1`)           | Drop inactive; unique `*-OLD` → strip to live sibling; **auto only if** that code ∈ text candidates; else fall through                                     | `alias_old_successor` / lexical reason                |
 | 4   | Dirty alias: duplicate buyer SKU → two active codes         | After in-date + active filter: ≥2 distinct codes → review; 1 unique active code → tentative auto (`ALIAS_AUTO_FLOOR=0.0`, reversal knob `alias_low_trust`) | `ambiguous_alias` / `alias_exact` (`alias_low_trust`) |
-| 5   | Cross-tenant resolution                                     | Every lookup tenant-scoped; buyer_sku shaped like `NRD-*` on Acme still maps only to Acme items    | (hard fail if violated)                               |
-| 6   | ID contradicts strong text (or barcode vs alias)            | Soft verify: unique strong text candidate ≠ ID → review; barcode≠alias → review                    | `id_text_conflict` / `id_id_conflict`                 |
+| 5   | Cross-tenant resolution                                     | Every lookup tenant-scoped; buyer_sku shaped like `NRD-*` on Acme still maps only to Acme items                                                            | (hard fail if violated)                               |
+| 6   | ID contradicts strong text (or barcode vs alias)            | Soft verify: unique strong text candidate ≠ ID → review; barcode≠alias → review                                                                            | `id_text_conflict` / `id_id_conflict`                 |
 
 
 **Also handled in arbitration:** thin top1–top2 margin after attr filter → `ambiguous_margin`. Pack tokens like `x6`/`x48` are **not** used as SKU identity in v1 (usually outer qty); explicit `(Bulk)` / bulk naming may discriminate.
@@ -177,7 +177,7 @@ Both cost ~abstention in the objective unless ops later prices them differently.
 
 **In scope.** Single-line matcher as above; train-tuned operating point; explainable `reason_code`s; eval harness foundation; offline stdlib + allowed libs only.
 
-**Out of scope.** Order-level context (“same as last month”); learning aliases from operator confirmations; full UOM/price consistency engine; OCR/channel-specific parsers; naked OLD→successor auto without text confirm; production shadow/canary (discussed in `SCALE.md` later).
+**Out of scope.** Order-level context (“same as last month”); learning aliases from operator confirmations; full UOM/price consistency engine; OCR/channel-specific parsers; naked OLD→successor auto without text confirm; production shadow/canary 
 
 **What we’d need in production before building the out-of-scope pieces.** Shadow-mode FP sampling, per-customer alias audit rates, catalogue diff/successor metadata quality, and measured review-queue cost by `reason_code`.
 
