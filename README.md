@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+
 # Backend Developer — Mindhive Technical Assessment
 
 **Version:** 2026.1 · **Window:** 3 calendar days · **Expected effort:** 14–18 hours · **Format:** open book
@@ -22,11 +23,13 @@ front of us.
 Two things make copy-paste answers fail here:
 
 1. **The holdout set is unlabelled and scored by us.** You cannot grade yourself against
-   our key. Overconfident matchers score *worse* than cautious ones.
+  our key. Overconfident matchers score *worse* than cautious ones.
 2. **You must keep a decision log.** Not a changelog — a record of choices, alternatives
-   rejected, and the evidence that settled it. We read it before we read your code.
+  rejected, and the evidence that settled it. We read it before we read your code.
 
 ---
+
+
 
 ## 1. Context
 
@@ -36,23 +39,25 @@ ERPs. One customer is an industrial hardware distributor; another sells frozen f
 runs their own catalogue, their own SKU conventions, and their own buyers who type things
 like `remax 4" grinding disc x24 ctn` and expect the right stock code on the order.
 
-The core problem: **given a free-text order line, resolve it to exactly one `item_code`
-in that tenant's catalogue — or refuse to answer.**
+The core problem: **given a free-text order line, resolve it to exactly one** `item_code`
+**in that tenant's catalogue — or refuse to answer.**
 
 The economics of that refusal are the whole job.
 
 - A **correct auto-match** saves an operator ~20 seconds.
 - An **abstention** costs ~40 seconds: it goes to a human review queue.
 - A **wrong auto-match** costs roughly **20× an abstention**: it ships the wrong goods,
-  and we find out from an angry customer three days later, after picking, packing, and a
-  credit note. Some are never caught and quietly corrupt the alias table that trains the
-  next match.
+and we find out from an angry customer three days later, after picking, packing, and a
+credit note. Some are never caught and quietly corrupt the alias table that trains the
+next match.
 
 So this is not an accuracy problem. It is a **precision-at-a-chosen-coverage** problem
 with asymmetric costs, and the interesting engineering is in knowing when the system does
 not know.
 
 ---
+
+
 
 ## 2. What ships with this assessment
 
@@ -79,57 +84,63 @@ Everything is stdlib Python 3.10+ and SQLite. Nothing calls the network.
 ### Data notes you should verify rather than trust
 
 - Catalogues contain **superseded items** (`*-OLD`, `disabled=1`), **active twins** with
-  the same visible name and different pack sizes, and **non-item rows** (`DELIVERY FEE`,
-  `OPENING BALANCE`).
+the same visible name and different pack sizes, and **non-item rows** (`DELIVERY FEE`,
+`OPENING BALANCE`).
 - `customer_sku_map.csv` contains **expired mappings**, **the same buyer SKU pointing at
-  two different codes**, mappings with `source=inferred_match` and `confidence` well
-  below 1.0, and buyer SKUs that happen to look like *another tenant's* item codes.
+two different codes**, mappings with `source=inferred_match` and `confidence` well
+below 1.0, and buyer SKUs that happen to look like *another tenant's* item codes.
 - Order lines carry typos, trade abbreviations (`S/S`, `ZP`, `SDS`), Malay/English mixing
-  (`skru`, `ayam`, `susu`), dropped tokens, pack/UOM confusion, embedded barcodes, and
-  lines that are not items at all.
+(`skru`, `ayam`, `susu`), dropped tokens, pack/UOM confusion, embedded barcodes, and
+lines that are not items at all.
 - Roughly a third of the labelled lines have **no correct answer**. `gt_item_code` is
-  blank for those. Predicting anything for them is a false positive.
+blank for those. Predicting anything for them is a false positive.
 - Tenant isolation is a hard rule. An `acme` line may never resolve to an `NRD-*` code.
 
 ---
+
+
 
 ## 3. Deliverables
 
 A single git repository (bundle or private repo link) containing:
 
-| File | What it is |
-|---|---|
-| `README.md` | How to run everything. Assume a clean machine, `python3` only. |
-| `DESIGN.md` | Task 1. ~1,500 words max, diagrams welcome. |
-| `DECISIONS.md` | Decision log. One entry per real choice. Format in §9. |
-| `predictions.csv` | Task 2 output over the holdout set. Schema in §5.3. |
-| `EVAL.md` | Task 3. Your metrics, your numbers, your error analysis. |
-| `PERF.md` | Task 4. Baseline, diagnosis, fix, measured result. |
-| `SYNC.md` | Task 5. Defects found, evidence, fixes, what you would change in the contract. |
-| `SCALE.md` | Task 6. ~800 words max. |
-| source + tests | Whatever you actually built. |
+
+| File              | What it is                                                                     |
+| ----------------- | ------------------------------------------------------------------------------ |
+| `README.md`       | How to run everything. Assume a clean machine, `python3` only.                 |
+| `DESIGN.md`       | Task 1. ~1,500 words max, diagrams welcome.                                    |
+| `DECISIONS.md`    | Decision log. One entry per real choice. Format in §9.                         |
+| `predictions.csv` | Task 2 output over the holdout set. Schema in §5.3.                            |
+| `EVAL.md`         | Task 3. Your metrics, your numbers, your error analysis.                       |
+| `PERF.md`         | Task 4. Baseline, diagnosis, fix, measured result.                             |
+| `SYNC.md`         | Task 5. Defects found, evidence, fixes, what you would change in the contract. |
+| `SCALE.md`        | Task 6. ~800 words max.                                                        |
+| source + tests    | Whatever you actually built.                                                   |
+
 
 Commit as you go. A repository with one commit called "solution" is a negative signal.
 
 ---
+
+
 
 ## 4. Task 1 — Problem framing and design *(design, 20%)*
 
 Before code. In `DESIGN.md`:
 
 1. **State the objective function.** Turn §1's cost table into something a machine can
-   optimise. What exactly are you maximising, subject to what constraint? Justify the
+  optimise. What exactly are you maximising, subject to what constraint? Justify the
    operating point you chose — and say who in the business gets to move it.
 2. **Decompose the pipeline.** What stages, in what order, with what contract between
-   them? Be explicit about which stages are deterministic and which are probabilistic,
+  them? Be explicit about which stages are deterministic and which are probabilistic,
    and why that ordering is the way round you chose.
 3. **Where would an LLM or embeddings actually earn their place?** For each place you use
-   one, state what cheaper mechanism you tried first, and what the fallback is when the
+  one, state what cheaper mechanism you tried first, and what the fallback is when the
    model is unavailable, slow, or wrong. If you use neither, defend that.
 4. **Name your failure modes before you build.** List the six most expensive ways this
-   system can be confidently wrong on *this data*, and the mechanism that catches each.
+  system can be confidently wrong on *this data*, and the mechanism that catches each.
 5. **Draw the boundary.** What is out of scope for 3 days, and what would you need to
-   see in production before you built it?
+  see in production before you built it?
 
 We are reading for: whether the framing survives contact with the data, whether you
 noticed that the expensive mistakes and the common mistakes are different populations,
@@ -137,7 +148,11 @@ and whether your design has a place for "I don't know" that is not an afterthoug
 
 ---
 
+
+
 ## 5. Task 2 — Build the matcher *(execution, 25%)*
+
+
 
 ### 5.1 Requirements
 
@@ -149,11 +164,11 @@ Hard requirements:
 - **Tenant-scoped.** Cross-tenant resolution is a correctness failure, not a bug.
 - **Deterministic given the same inputs.** Same input, same output, run to run.
 - **Explainable.** Every decision carries a machine-readable reason. An operator in the
-  review queue must be able to see *why*, and an engineer must be able to grep for it.
+review queue must be able to see *why*, and an engineer must be able to grep for it.
 - **Budgeted.** ≤ 250 ms p95 per line on a laptop, cold caches excluded, no network. Your
-  harness must measure and report this, not assume it.
+harness must measure and report this, not assume it.
 - **Cold-start safe.** A brand-new tenant has a catalogue and zero alias history. It must
-  still work, and its behaviour must be different from a mature tenant's — say how.
+still work, and its behaviour must be different from a mature tenant's — say how.
 
 Suggested (not mandated) shape: cheap exact/normalised identifier lanes → lexical
 candidate generation → optional semantic lane → a scoring/arbitration step that decides
@@ -182,22 +197,24 @@ line_id,item_code,confidence,decision,reason_code,candidates
 
 - `item_code` — blank when abstaining.
 - `confidence` — float in [0,1], calibrated in the sense that it is comparable across
-  lanes. Explain your calibration in `EVAL.md`.
+lanes. Explain your calibration in `EVAL.md`.
 - `decision` — one of `auto`, `review`, `reject`.
 - `reason_code` — short stable token, e.g. `alias_exact`, `barcode_hit`,
-  `lexical_unique`, `ambiguous_twins`, `no_candidate_above_floor`, `not_an_item`.
+`lexical_unique`, `ambiguous_twins`, `no_candidate_above_floor`, `not_an_item`.
 - `candidates` — up to 3 `item_code:score` pairs, `|`-separated, best first. Used to
-  score recall@3 even when you abstain.
+score recall@3 even when you abstain.
+
+
 
 ### 5.4 How we score it
 
 On our labels, over the holdout:
 
-- **Precision on `decision=auto`** — the number that matters most.
+- **Precision on** `decision=auto` — the number that matters most.
 - **Coverage** — share of lines auto-answered.
 - **Net value** using the §1 cost model, at your chosen operating point.
 - **Abstention quality** — of lines with no correct answer, how many you correctly
-  refused; of lines you abstained on, how often the right code was in `candidates`.
+refused; of lines you abstained on, how often the right code was in `candidates`.
 - **Cross-tenant violations** — any is a hard fail on this task.
 
 A submission that answers everything at 88% precision will score below one that answers
@@ -205,30 +222,34 @@ A submission that answers everything at 88% precision will score below one that 
 
 ---
 
+
+
 ## 6. Task 3 — Evaluation *(rigour, 20%)*
 
 The JD says this is non-negotiable, and we mean it. In `EVAL.md`:
 
 1. **Build the harness.** One command, reproducible, runs against `order_lines_train.csv`
-   and prints your metrics. Include per-tenant and per-noise-class breakdowns — the
+  and prints your metrics. Include per-tenant and per-noise-class breakdowns — the
    classes are not labelled in the data you receive, so define your own segmentation and
    justify it.
 2. **Defend your metric.** Show what accuracy alone would have told you and why that would
-   have been misleading here. Include the operating-point curve (precision vs coverage) —
+  have been misleading here. Include the operating-point curve (precision vs coverage) —
    not a single point.
 3. **Error analysis, by hand.** Take **20 specific failures**, name them by `line_id`,
-   and give root cause, cost class, and the fix you would make. Group them: which are one
+  and give root cause, cost class, and the fix you would make. Group them: which are one
    bug, which are the same missing capability, which are data problems you cannot fix in
    code. This section is where we learn the most about you; do not delegate it.
 4. **Show the label problem.** The provided labels are not perfect. Find at least three
-   lines where you believe the label is wrong or the task is under-specified, argue it,
+  lines where you believe the label is wrong or the task is under-specified, argue it,
    and say what you would do about it in production. (Yes, this is a real trap. Yes, they
    exist.)
 5. **Regression safety.** How would this harness stop a bad change from shipping? Be
-   concrete: thresholds, gates, what breaks the build, and how you avoid a benchmark that
+  concrete: thresholds, gates, what breaks the build, and how you avoid a benchmark that
    silently rots.
 
 ---
+
+
 
 ## 7. Task 4 — The report that times out *(performance, 15%)*
 
@@ -262,32 +283,34 @@ produced by an independently written query and verified row-for-row against
 Deliver in `PERF.md`:
 
 1. **An estimated baseline, with your method shown.** Do not run the whole thing —
-   estimate it. Measure slices, state what you are extrapolating *along*, and validate the
+  estimate it. Measure slices, state what you are extrapolating *along*, and validate the
    assumption instead of asserting it: does the cost scale with rows in the window, with
    output groups, with tenants, with days? Two of those give answers that differ by 4×, and
    only one of them is right. Show the measurements that told you which.
 2. **The diagnosis, ranked by cost, established empirically.** Ablate: remove one metric at
-   a time and re-measure. Report the ranking you found, including the parts that surprised
+  a time and re-measure. Report the ranking you found, including the parts that surprised
    you. If the answer turns out to be "no single column dominates", that is a finding —
    say what it implies about where the fix has to happen, and prove it the same way.
 3. **The fix.** Byte-identical results, inside the budget. State your target before you
-   start, then report what you actually hit — including if you missed.
-4. **One new column: `p95_latency_ms`** — nearest-rank p95 of `latency_ms` over the same
-   tenant-day set as `max_latency_ms`. Adding it must not blow the budget.
+  start, then report what you actually hit — including if you missed.
+4. **One new column:** `p95_latency_ms` — nearest-rank p95 of `latency_ms` over the same
+  tenant-day set as `max_latency_ms`. Adding it must not blow the budget.
 5. **What you did not fix, and why.** Under a real deadline you fix the expensive thing
-   and leave the rest. Name what you left, what it costs, and when you would come back.
+  and leave the rest. Name what you left, what it costs, and when you would come back.
 6. **The trade-offs you accepted.** Indexes cost write throughput; this ledger takes ~40
-   writes per order line at peak. Materialisation costs freshness; ops believe this
+  writes per order line at peak. Materialisation costs freshness; ops believe this
    dashboard is live. Schema changes cost a migration on a hot table. Say what you chose
    and what it costs.
 7. **The honest ceiling.** At 50× today's volume, does your fix hold? What breaks first,
-   what is the next architecture, and why is that not what you built today?
+  what is the next architecture, and why is that not what you built today?
 
 A correct rewrite that lands inside the budget is table stakes. What we are grading is
 whether you found the dominant cost before touching anything, and whether you can prove
 the ranking rather than assert it.
 
 ---
+
+
 
 ## 8. Task 5 — The sync that double-wrote *(debugging, 15%)*
 
@@ -310,20 +333,22 @@ report.
 Deliver in `SYNC.md`, plus code and tests:
 
 1. **A defect list.** For each: the ticket it explains, the exact mechanism, and a
-   **failing test that isolates it and passes after your fix**. One test per defect — a
+  **failing test that isolates it and passes after your fix**. One test per defect — a
    single test that goes green because you fixed four things is worth much less.
 2. **There are more defects than there are tickets.** Some are latent: they have not
-   produced a ticket yet because the conditions have not lined up. Find them, and say what
+  produced a ticket yet because the conditions have not lined up. Find them, and say what
    would have to happen in production for each to surface.
 3. **Fixes**, with the invariant each one restores stated explicitly.
 4. **The contract you wish you had.** What would you ask the vendor for, in priority
-   order, and how do you stay correct while they say no?
+  order, and how do you stay correct while they say no?
 5. **What breaks at scale.** This runs per-tenant every 5 minutes across 500 tenants. Say
-   what falls over first and how you would know before a customer tells you.
+  what falls over first and how you would know before a customer tells you.
 
 Assume the process can be killed at any moment. Crash-safety is part of correctness here.
 
 ---
+
+
 
 ## 9. Task 6 — Scale and rollout *(judgement, 5%)*
 
@@ -332,14 +357,16 @@ order lines a day, and the alias table grows from every confirmed order.
 
 - What is the first thing to break, and what is your evidence?
 - If you used embeddings: what does re-indexing cost when a tenant edits 40k items at 2am,
-  and how does a tenant with a stale index behave in the meantime?
+and how does a tenant with a stale index behave in the meantime?
 - The alias table learns from operator confirmations — including their mistakes. How do
-  you stop a feedback loop that entrenches a wrong match, given that a wrong match is 20x
-  the cost of an abstention?
+you stop a feedback loop that entrenches a wrong match, given that a wrong match is 20x
+the cost of an abstention?
 - How do you ship a matcher change safely? Shadow, canary, both, neither — and how you
-  decide it worked when the ground truth arrives days later.
+decide it worked when the ground truth arrives days later.
 
 ---
+
+
 
 ## 10. The decision log
 
@@ -361,33 +388,34 @@ entry you never wrote.
 
 ---
 
+
+
 ## 11. Rules, scope, and honesty
 
 - **Timebox is yours to manage.** If you spend all 3 days on Task 2 and stub the rest,
-  say so in `README.md` and tell us why that was the right call. We will grade the
-  argument.
+say so in `README.md` and tell us why that was the right call. We will grade the
+argument.
 - **Do not hand-tune to the holdout.** You cannot score it anyway, and we can see it.
 - **Attribute your tools.** If a section is substantially model-generated, say so — we do
-  not mind, and it costs nothing. Claiming otherwise, when the walkthrough disagrees, ends
-  the process.
+not mind, and it costs nothing. Claiming otherwise, when the walkthrough disagrees, ends
+the process.
 - **If something in this brief is wrong, ambiguous, or contradicts the data, say so** in
-  `README.md` and proceed under a stated assumption. Finding the ambiguities is part of
-  the assessment.
+`README.md` and proceed under a stated assumption. Finding the ambiguities is part of
+the assessment.
 - **Questions are allowed** at any point during the 3 days. Asking a sharp one is a
-  positive signal; we will note it.
+positive signal; we will note it.
+
+
 
 ## 12. Walkthrough (60 minutes, after submission)
 
 - 10 min — you present the problem as you framed it. Not your code: the problem.
 - 20 min — we drive: pick failures from your own error analysis, ask why, ask what you'd
-  do differently, ask what happens if the cost ratio changes from 20× to 3×.
+do differently, ask what happens if the cost ratio changes from 20× to 3×.
 - 20 min — **live change.** We give you a new noise pattern or a shifted constraint and
-  you modify your code with us watching. Small, scoped, and in your own codebase. Tools
-  allowed; explanation required.
+you modify your code with us watching. Small, scoped, and in your own codebase. Tools
+allowed; explanation required.
 - 10 min — your questions.
 
-Good luck. Build the part that matters and tell us what you skipped.
-=======
-# 2026-backend-engineer-assessment
-MindHive Backend Engineer Assessment
->>>>>>> d41e7d73f5b53120c74790312ef4572dcc65864e
+# Good luck. Build the part that matters and tell us what you skipped.
+
