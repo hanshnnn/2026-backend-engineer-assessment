@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Backend Developer — Mindhive Technical Assessment
 
 **Version:** 2026.1 · **Window:** 3 calendar days · **Expected effort:** 14–18 hours · **Format:** open book
@@ -386,3 +387,7 @@ entry you never wrote.
 - 10 min — your questions.
 
 Good luck. Build the part that matters and tell us what you skipped.
+=======
+# 2026-backend-engineer-assessment
+MindHive Backend Engineer Assessment
+>>>>>>> d41e7d73f5b53120c74790312ef4572dcc65864e
