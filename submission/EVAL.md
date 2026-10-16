@@ -139,7 +139,7 @@ Full grid: `debug/operating_point_sweep_20261016_005103.csv` (51 rows).
 | 1.00       | 0.03     | 0.367    | 0.890     | −21,500     | 137 | 17  |
 
 
-(Post-hoc cell at shipped 0.90/0.03 can differ by a couple of lines from live smoke totals — re-decide on stored top-3 candidates, not a full matcher re-run.)
+
 
 ### Residual FPs are not movable by these knobs
 
@@ -178,7 +178,119 @@ Keep the matcher’s internal decision rule as shipped:
 
 ## 3. Error analysis (20 failures)
 
-*Stub — pick 20* `line_id`*s from* `auto_wrong` *+ costly* `abstain_miss`*; root cause, cost class, fix grouping.*
+Source: `debug/train_smoke_20261016_005103.csv`. Train has **18** `auto_wrong` (−800 each) and **74** `abstain_miss` (−40 each). Below: **20 named lines**, grouped by root cause. Fix type is what I would change — not what shipped in this submission.
+
+Cost classes: **AW** = `auto_wrong`, **AM** = `abstain_miss`.
+
+### ++Group A  (AUTO WRONG)++
+
+
+
+### blank GT ∩ exact catalogue name → confident lexical auto (data / policy)
+
+All **18** train AWs are acme, blank `gt_item_code`, `lexical_unique` (almost all conf = 1.0). Attr filtering made near-siblings drop out, so an exact `item_name` hit looks unique and autos. Threshold sweeps (§2) cannot move this mass.
+
+
+| line_id    | outcome | reason           | root cause                                                       | fix                                                                                     |
+| ---------- | ------- | ---------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| ACM-T-0022 | AW      | `lexical_unique` | Exact name appears in acme catalogue, active, but gt shows blank | Business / label: audit blank∩exact-name; do not invent a code gate that kills true TPs |
+| ACM-T-0028 | AW      | `lexical_unique` | Exact name appears in acme catalogue, active, but gt shows blank | same                                                                                    |
+| ACM-T-0050 | AW      | `lexical_unique` | Exact name appears in acme catalogue, active, but gt shows blank | same                                                                                    |
+| ACM-T-0055 | AW      | `lexical_unique` | Exact name appears in acme catalogue, active, but gt shows blank | same                                                                                    |
+| ACM-T-0064 | AW      | `lexical_unique` | Exact name appears in acme catalogue, active, but gt shows blank | same                                                                                    |
+| ACM-T-0082 | AW      | `lexical_unique` | Exact name appears in acme catalogue, active, but gt shows blank | same                                                                                    |
+
+
+
+
+### ++Group A′++
+
+### brandless false unique (capability)
+
+
+| line_id    | outcome | reason                  | root cause                                                                                                                                          | fix                                                    |
+| ---------- | ------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| ACM-T-0147 | AW      | `lexical_unique` @ 0.95 | `Cable Tie 200mm White` — no brand; many brand twins in catalogue; twin policy does not disagree on **brand**, shortlist collapses to one Hitex hit | Abstain when brandless and ≥2 brands share leaf+attrs. |
+
+
+
+
+### ++Group B — list / chat prefix noise (capability)++
+
+`normalize` already strips `-`, `need`, `please send`, `item:`. It does **not** strip `1)` / `2)`.
+
+
+| line_id    | outcome | reason            | root cause                                                                                        | fix                                                         |
+| ---------- | ------- | ----------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| ACM-T-0057 | AM      | `ambiguous_twins` | `1) Hietx Cable Tie 300m Natural` — list prefix + typo + `300m`≠`300mm`; GT already top @ 0.915   | Strip `^\d+\)` before brand/attr; also Group C (`natural`)  |
+| ACM-T-0125 | AM      | `ambiguous_twins` | `- Knato Masking Taep…` — leading `-` already stripped; residual is typo (`Knato`/`Taep`) + twins | Typo tolerance / grade twin; **not** primarily a prefix bug |
+
+
+
+
+### Group C — missing attr vocabulary → twins with GT on top (capability)
+
+`natural` is catalogue colour; `brass` is catalogue material. Neither is in `attrs.py` (`_COLOURS` / `_FINISH_PATTERNS`). 
+
+Query leaves colour/finish unspecified → `unspecified_attr_disagreement` → review even when top candidate is GT @ 1.0. 
+
+
+| line_id      | outcome | reason            | root cause                                                              | fix                                                                       |
+| ------------ | ------- | ----------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| ACM-T-0168   | AM      | `ambiguous_twins` | `Natural` not extracted                                                 | Add `natural` as colour                                                   |
+| `ACM-T-0018` | AM      | `ambiguous_twins` | `normalize` turns `/`→space, so `3/4"` size extract degrades on valves. | don't strip "/" but might hurt other positive cases                       |
+| ACM-T-0085   | AM      | `ambiguous_twins` | `brass` not extracted (+ inch size noise)                               | Add `brass` as finish/material; fix fractional-inch after slash normalize |
+| ACM-T-0222   | AM      | `ambiguous_twins` | same                                                                    | same                                                                      |
+
+
+
+
+### Group D — OLD alias + weak text → successor confirm never fires (policy / capability)
+
+Alias maps to `*-OLD`; live sibling exists; `alias_old_successor` only autos if live code ∈ **text** candidates. Underspec text never surfaces it → fall through to junk lexical review. 
+
+
+| line_id    | outcome | reason             | root cause                                                      | fix                                                                                                 |
+| ---------- | ------- | ------------------ | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| NRD-T-0010 | AM      | `ambiguous_margin` | `006703262` → `NRD-PRAW0055-OLD`; text `Bay 16/20 2kg` too weak | Inject live successor into candidates, or auto unique OLD→live without text confirm (business call) |
+| ACM-T-0132 | AM      | `ambiguous_margin` | `006495314` → `ACM-GIWI0811-OLD`; text `GI Wire`                | same                                                                                                |
+| NRD-T-0038 | AM      | `ambiguous_margin` | `003449087` → `NRD-CHIC0486-OLD`; text `Breast 1kg`             | same                                                                                                |
+
+
+Train scale: ~29 buyer_sku `abstain_miss` were OLD-only fallthrough in an earlier probe; these three are exemplars.
+
+### Group E — multi-word brand typo (capability)
+
+
+| line_id    | outcome | reason                     | root cause                                                                                                                         | fix                                           |
+| ---------- | ------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| NRD-T-0002 | AM      | `no_candidate_above_floor` | `Cape ay…` — brand is `Cape Bay`; multi-word brands are exact-substring only; fuzzy is single-word only → brandless → wrong family | Fuzzy / partial multi-word brand (or synonym) |
+
+
+
+
+### Group F — other AM modes (sampled to round out the 20)
+
+
+| line_id    | outcome | reason              | root cause                                             | fix                                                                               |
+| ---------- | ------- | ------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| NRD-T-0009 | AM      | `ambiguous_barcode` | Same barcode on active twin `NRD-FULL0174` / `0174B`   | Pack/UOM disambiguation on barcode collisions; else forced review (correct today) |
+| ACM-T-0195 | AM      | `ambiguous_twins`   | `putih` (Malay white) not in colour / synonym table    | Map `putih`→`white` in normalize                                                  |
+| ACM-T-0061 | AM      | `ambiguous_twins`   | Pack cue `x12 case` but bulk twin `…B` still disagrees | Stronger pack→non-bulk preference, or keep abstain when bulk twin present         |
+
+
+
+
+### Fix-type summary
+
+
+| type                                | groups            | action                                                                              |
+| ----------------------------------- | ----------------- | ----------------------------------------------------------------------------------- |
+| **Data / policy**                   | A                 | Label audit; Product owns whether blank and exact-name auto is acceptable           |
+| **One capability, many lines**      | C, and A′ / B / E | Attr vocab; brandless brand-disagreement; list-prefix strip; multi-word brand fuzzy |
+| **Policy knob already in pipeline** | D                 | Relax or seed OLD→live confirm                                                      |
+| **Acceptable abstain / niche**      | F (`0009`)        | Barcode twins should not silent-pick                                                |
+
 
 ---
 
@@ -186,12 +298,56 @@ Keep the matcher’s internal decision rule as shipped:
 
 ## 4. Label / under-specification issues
 
-*Stub — ≥3 lines where GT is wrong or the task is underspecified.*
+The train key is not a perfect oracle. Three cases (pattern + exemplars):
+
+### 4.1 Blank GT on an exact catalogue `item_name` (label trap)
+
+**Example:** `ACM-T-0064`, `ACM-T-0082`, `ACM-T-0028` (same as Group A).
+
+**Analyse:** The line text matches an active catalogue row, thats why seeing`lexical_unique` @ 1.0, but `gt_item_code` is blank. Scoring calls that `auto_wrong`. 
+
+Depends what the absent label inclined towards: must abstain in these cases (out of system ability to detect the hidden rule) or business side to clarify with client 
+
+**Production:** periodic audit of blank GT ∩ exact/near-exact `item_name`; ensure operator confirms into `customer_sku_map`. 
+
+### 4.2 Brandless underspec with many catalogue twins
+
+**Example:** `ACM-T-0147` — `Cable Tie 200mm White`, blank GT.
+
+**Analyse:** Even if GT were filled, the line does not name a brand among Hitex / Vermont / Stallion / … white 200mm ties. Auto-picking one brand is under-specified for the buyer. 
+
+**Production:** force review when brandless and brand twins remain after attrs
+
+### 4.3 Matching catalogue x available stock
+
+**Example:** `ACM-T-0022` — exact `Kanto Nitrile Glove M Blue` (and siblings differ by size/colour in candidates). Blank GT again. Ops may also care about stock / pack (line UOM `box`) without that being in GT.
+
+**Analyse:**There are other auto_correct matches of out of stock catalogue hence this system does not consider the availability when it comes to decision.
+
+**Production:** separate “match identity” from “promise ship” — matcher returns code + evidence; availability is a downstream gate
 
 ---
 
-
-
 ## 5. Regression safety
 
-*Stub — concrete gates on precision / net / cross-tenant / p95 latency that break the build.*
+Gates below are what I would enforce in CI against the stamped smoke metrics — not yet wired as an exit-code gate in this repo.
+
+
+| gate                   | break the build if                             | why                                                                   |
+| ---------------------- | ---------------------------------------------- | --------------------------------------------------------------------- |
+| **Cross-tenant**       | `cross_tenant_violations > 0`                  | Hard correctness; any acme→`NRD-`* or reverse fails the task          |
+| **Precision on auto**  | `P < 0.90` on train smoke                      | Below ~90% the −800 AW economics dominate; current baseline ≈0.925    |
+| **Auto-wrong ceiling** | `auto_wrong > 18` on this train file           | Allows the known blank-GT Group A mass; forbids new FP modes          |
+| **Net value floor**    | `net_value < −20,000`                          | Catches “answer more, precision dies” regressions (~baseline −17,220) |
+| **Coverage**           | `coverage < 0.45` **or** `> 0.70` &&`P < 0.92` | Low cov = silent capability loss; high cov + soft P = aggressive auto |
+| **p95 latency**        | `p95_ms > 200` on this laptop-class smoke      | Matcher must stay interactive; baseline p95 ≈93 ms                    |
+| **Twin regressions**   | any fail in `tests/test_attrs.py`              | Underspec finish/bulk must stay review (Stallion flap, HDG bulk, …)   |
+
+
+**How the benchmark avoids silent rot**
+
+1. **Noise classes are input-shaped**, not `reason_code`-shaped — so threshold churn cannot redefine the breakdown.
+2. **Holdout is unlabelled** — CI does not invent holdout precision; only shape checks (reason mix, coverage band, cross-tenant=0, latency).
+3. **Known AW allow-list** — Group A `line_id`s are contested labels; a new AW outside that set is a real regression even if total `aw` stays ≤18.
+
+Reversal triggers already logged in `MINDLOG.md`: restore alias conf floor if low-conf alias FPs appear; tighten OLD→live if successor autos go wrong.
