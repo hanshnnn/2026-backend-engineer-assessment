@@ -61,7 +61,6 @@ def pull(erp: FakeErp, store: LocalStore, page_size: int = 50) -> int:
         page = erp.list_changes(since=store.cursor, limit=page_size)
         if not page:
             break
-        store.set_cursor(page[-1].updated_at)
         for rec in page:
             local = store.records.get(rec.external_id)
             if local and local.dirty and local.updated_at_utc > rec.updated_at:
@@ -75,8 +74,18 @@ def pull(erp: FakeErp, store: LocalStore, page_size: int = 50) -> int:
                 dirty=False,
             ))
             pulled += 1
+        # ERP filters updated_at > since at second resolution; ties are common.
+        # Never park the cursor on a timestamp we have not fully drained, or
+        # siblings after the page boundary are skipped forever.
         if len(page) < page_size:
+            store.set_cursor(page[-1].updated_at)
             break
+        last_ts = page[-1].updated_at
+        earlier = [r for r in page if r.updated_at < last_ts]
+        if earlier:
+            store.set_cursor(earlier[-1].updated_at)
+        else:
+            store.set_cursor(last_ts)
     return pulled
 
 
