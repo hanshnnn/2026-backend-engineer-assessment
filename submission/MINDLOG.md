@@ -55,14 +55,14 @@ tenant → barcode → alias → ID checks → text (brand/family/attrs) → fin
 ### Alias lane (buyer_sku)
 
 
-| Rule                    | Decision                                                             |
-| ----------------------- | -------------------------------------------------------------------- |
-| Lookup key              | `(tenant, customer_id, buyer_sku)`                                   |
-| Date                    | Use `order_date` vs `valid_from` / `valid_to`                        |
-| OLD / disabled          | Drop; unique `*-OLD` → strip live sibling; auto iff ∈ text cands (`alias_old_successor`); else fall through |
-| ≥2 different codes left | `review` / `ambiguous_alias` — stop                                  |
-| 1 code, unique after filters | auto `alias_exact` (ignore `source`; **no conf floor** — see 2026-10-14) |
-| ≥2 codes                     | `review` / `ambiguous_alias`                                              |
+| Rule                         | Decision                                                                                                    |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Lookup key                   | `(tenant, customer_id, buyer_sku)`                                                                          |
+| Date                         | Use `order_date` vs `valid_from` / `valid_to`                                                               |
+| OLD / disabled               | Drop; unique `*-OLD` → strip live sibling; auto iff ∈ text cands (`alias_old_successor`); else fall through |
+| ≥2 different codes left      | `review` / `ambiguous_alias` — stop                                                                         |
+| 1 code, unique after filters | auto `alias_exact` (ignore `source`; **no conf floor** — see 2026-10-14)                                    |
+| ≥2 codes                     | `review` / `ambiguous_alias`                                                                                |
 
 
 Why ignore source: one knob is simpler; be ready to defend autoing some `inferred_match@1.0`.  
@@ -118,21 +118,21 @@ Why ignore source: one knob is simpler; be ready to defend autoing some `inferre
 ## Reason codes I’m aiming for
 
 
-| Code                                  | Rough meaning                          |
-| ------------------------------------- | -------------------------------------- |
-| `alias_exact`                         | Trusted unique alias auto              |
+| Code                                  | Rough meaning                                |
+| ------------------------------------- | -------------------------------------------- |
+| `alias_exact`                         | Trusted unique alias auto                    |
 | `alias_old_successor`                 | OLD map stripped to live; text cands confirm |
-| `alias_low_trust`                     | Unique alias but conf too low → review |
-| `ambiguous_alias`                     | Two+ codes for one buyer SKU           |
-| `barcode_hit`                         | Barcode auto                           |
-| `ambiguous_barcode`                   | Two+ active barcode hits               |
-| `id_id_conflict`                      | Barcode vs alias disagree              |
-| `id_text_conflict`                    | ID vs strong text disagree             |
-| `ambiguous_twins`                     | Family clear, identity not             |
-| `ambiguous_margin`                    | Scores too close                       |
-| `lexical_unique`                      | Text path unique auto                  |
-| `not_an_item` / `brand_not_in_tenant` | Junk / wrong world                     |
-| `no_candidate_above_floor`            | Nothing good enough                    |
+| `alias_low_trust`                     | Unique alias but conf too low → review       |
+| `ambiguous_alias`                     | Two+ codes for one buyer SKU                 |
+| `barcode_hit`                         | Barcode auto                                 |
+| `ambiguous_barcode`                   | Two+ active barcode hits                     |
+| `id_id_conflict`                      | Barcode vs alias disagree                    |
+| `id_text_conflict`                    | ID vs strong text disagree                   |
+| `ambiguous_twins`                     | Family clear, identity not                   |
+| `ambiguous_margin`                    | Scores too close                             |
+| `lexical_unique`                      | Text path unique auto                        |
+| `not_an_item` / `brand_not_in_tenant` | Junk / wrong world                           |
+| `no_candidate_above_floor`            | Nothing good enough                          |
 
 
 ---
@@ -183,9 +183,9 @@ Use when building / editing DESIGN later:
 | 2026-10-13 slice 2        | Text normalize + brand/family + RapidFuzz; soft oppose live                 |
 | 2026-10-13/14 slice 3     | Attr extract + twin/bulk filter; precision dipped; blank-GT FP class        |
 | 2026-10-14 blank-GT FPs   | ACME-skewed blank-GT `auto_wrong`; question labels; keep logic; prod plan   |
-| 2026-10-14 brand soft     | Drop denylist/`_PRODUCT_START`; catalogue exact+fuzzy; foreign=weak item   |
-| 2026-10-14 item phrase    | Catalogue leaf + brand-stripped name shortlist before attrs                |
-| 2026-10-14 alias floor    | Drop 0.55/`alias_low_trust` gate — unique alias autos; train-only evidence |
+| 2026-10-14 brand soft     | Drop denylist/`_PRODUCT_START`; catalogue exact+fuzzy; foreign=weak item    |
+| 2026-10-14 item phrase    | Catalogue leaf + brand-stripped name shortlist before attrs                 |
+| 2026-10-14 alias floor    | Drop 0.55/`alias_low_trust` gate — unique alias autos; train-only evidence  |
 
 
 ---
@@ -282,6 +282,7 @@ Use when building / editing DESIGN later:
 ### 2026-10-13/14 — Slice 3 (attrs + twins)
 
 **Shipped:**
+
 - `attrs.py` — extract size / finish / colour / grade / bulk from text + item_name; `item_matches_query`; `unspecified_attr_disagreement`
 - `lanes/text.py` — after brand/family: hard-filter pool by attrs the line stated → if remaining items disagree on an **unspecified** attr → `ambiguous_twins` → else RapidFuzz decide
 - pack qty `xN` ignored for SKU identity; explicit `(Bulk)` is a discriminator
@@ -292,24 +293,28 @@ Use when building / editing DESIGN later:
 
 **Train smoke (slice 2 → slice 3):**
 
-| | slice 2 | slice 3 |
-|---|---|---|
-| auto correct | 125 | 176 |
-| auto wrong | 4 | **17** |
-| precision on auto | **0.969** | **0.912** |
-| coverage | ~31% | ~46% |
-| net value | **−12340** | **−19160** (worse) |
-| `ambiguous_twins` | — | 117 |
-| `ambiguous_margin` | 198 | 13 |
+
+|                    | slice 2    | slice 3            |
+| ------------------ | ---------- | ------------------ |
+| auto correct       | 125        | 176                |
+| auto wrong         | 4          | **17**             |
+| precision on auto  | **0.969**  | **0.912**          |
+| coverage           | ~31%       | ~46%               |
+| net value          | **−12340** | **−19160** (worse) |
+| `ambiguous_twins`  | —          | 117                |
+| `ambiguous_margin` | 198        | 13                 |
+
 
 **Original 4 FPs after slice 3:**
 
-| line | result | note |
-|---|---|---|
-| ACM-T-0066 Tolsen Bolt M8x50 | `review` / `ambiguous_twins` | fixed — finish underspec |
-| ACM-T-0134 … M8x50 HDG | `review` / `ambiguous_twins` | fixed — bulk twin |
-| NRD-T-0052 Breast Strips 5kg | `review` / `ambiguous_twins` | fixed — bulk twin |
-| ACM-T-0028 Stallion Ball Valve 1-1/4" PVC | still `auto` wrong | unique name; no twin to disagree |
+
+| line                                      | result                       | note                             |
+| ----------------------------------------- | ---------------------------- | -------------------------------- |
+| ACM-T-0066 Tolsen Bolt M8x50              | `review` / `ambiguous_twins` | fixed — finish underspec         |
+| ACM-T-0134 … M8x50 HDG                    | `review` / `ambiguous_twins` | fixed — bulk twin                |
+| NRD-T-0052 Breast Strips 5kg              | `review` / `ambiguous_twins` | fixed — bulk twin                |
+| ACM-T-0028 Stallion Ball Valve 1-1/4" PVC | still `auto` wrong           | unique name; no twin to disagree |
+
 
 **Why wrong autos went 4 → 17:** attr filter removes near-siblings that used to create `ambiguous_margin`. Exact catalogue-name lines with **blank GT** then look unique @ 1.0 → `lexical_unique`. Twin policy worked; side effect unlocked blank-GT exact autos (see next note).
 
@@ -322,18 +327,20 @@ Use when building / editing DESIGN later:
 - Removed `_FOREIGN_BRAND_TOKENS` denylist and `_PRODUCT_START` allowlist
 - Brand from **tenant catalogue only**: multi-word exact → unigram exact → glued prefix (`HitexNitrile`) → fuzzy typo (`BRAND_FUZZY_FLOOR=78`)
 - **Hit** → soft-restrict pool to that brand; **miss** → full active catalogue (brandless path)
-- Foreign refuse only if leading token looks brand-shaped **and** no tenant brand match **and** top item score &lt; 0.72 → `brand_not_in_tenant` (Cadbury still rejects; Cable Tie does not)
+- Foreign refuse only if leading token looks brand-shaped **and** no tenant brand match **and** top item score < 0.72 → `brand_not_in_tenant` (Cadbury still rejects; Cable Tie does not)
 
 **Train smoke after brand rewrite:**
 
-| | post-attrs (slice 3) | after brand soft |
-|---|---|---|
-| auto correct | 176 | 182 |
-| auto wrong | 17 | 18 |
-| precision | 0.912 | 0.910 |
-| coverage | 46% | 48% |
-| `brand_not_in_tenant` | 63 | **46** |
-| net value | −19160 | −19560 |
+
+|                       | post-attrs (slice 3) | after brand soft |
+| --------------------- | -------------------- | ---------------- |
+| auto correct          | 176                  | 182              |
+| auto wrong            | 17                   | 18               |
+| precision             | 0.912                | 0.910            |
+| coverage              | 46%                  | 48%              |
+| `brand_not_in_tenant` | 63                   | **46**           |
+| net value             | −19160               | −19560           |
+
 
 Slightly more coverage; foreign rejects fewer (less hardcoded). Blank-GT Option D unchanged. Debug CSV: `submission/debug/train_smoke_*.csv` (fallback if Excel locks `train_smoke.csv`).
 
@@ -355,14 +362,16 @@ brand soft → phrase shortlist (leaf + brand-stripped name) → attrs/twins →
 
 **Train smoke:**
 
-| | after brand soft | after item phrase |
-|---|---|---|
-| auto correct | 182 | **189** |
-| auto wrong | 18 | 18 |
-| precision | 0.910 | **0.913** |
-| coverage | 48% | **49%** |
-| `ambiguous_twins` | 127 | **88** |
-| net value | −19560 | **−19140** |
+
+|                   | after brand soft | after item phrase |
+| ----------------- | ---------------- | ----------------- |
+| auto correct      | 182              | **189**           |
+| auto wrong        | 18               | 18                |
+| precision         | 0.910            | **0.913**         |
+| coverage          | 48%              | **49%**           |
+| `ambiguous_twins` | 127              | **88**            |
+| net value         | −19560           | **−19140**        |
+
 
 Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refreshed: `submission/debug/train_smoke.csv`.
 
@@ -370,22 +379,26 @@ Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refres
 
 ### 2026-10-14 — Blank-GT `auto_wrong` (post-attrs smoke)
 
-**Observation (train):** Current smoke has **18** `auto_wrong` — **all `acme`** (0 nordic). All blank `gt_item_code`, all `lexical_unique` (mostly @ 1.0), raw text is an exact / near-exact catalogue `item_name` hit, typically no buyer_sku/barcode. Families skewed hardware: PVCP / ANGL / SELF (+ a few others).
+**Observation (train):** Current smoke has **18** `auto_wrong` — **all** `acme` (0 nordic). All blank `gt_item_code`, all `lexical_unique` (mostly @ 1.0), raw text is an exact / near-exact catalogue `item_name` hit, typically no buyer_sku/barcode. Families skewed hardware: PVCP / ANGL / SELF (+ a few others).
 
 **No clear miss by the system:** Hand + checks found no separating bug pattern the matcher failed to encode.
+
 - Not UOM — vague `unit`/`ea`/`pcs` also on correct autos; prices that exist sit near `list_price`.
 - Not twins / OOS — no bulk twin to force abstain; stock qty not discriminative.
 - Same shape as many **labeled** exact lexical autos → abstaining this shape would also kill true positives.
 
 **Label stance:** These are the points I am **questioning as labeled**. Blank GT says “unmatchable / any auto is FP,” but the line text points at a real unique catalogue name. Treating that as a matcher flaw overfits noise; treat as **suspect / under-specified labels** until Product clarifies.
 
-**Decision:** **Maintain current auto logic** (do not add an inseparable abstain gate). Explicitly **flag / list these `line_id`s** as contested train labels for EVAL and for anyone re-scoring the set.
+**Decision:** **Maintain current auto logic** (do not add an inseparable abstain gate). Explicitly **flag / list these** `line_id`**s** as contested train labels for EVAL and for anyone re-scoring the set.
 
 **Production (what to counter later — not v1 code):**
+
 - Human review queue / shadow mode on first-seen exact-name autos without ID corroboration
 - Operator confirm → promote to trusted alias so next time is ID-backed
 - Periodic label audit on blank-GT lines that exact-match catalogue names
 - Only then consider a policy knob (e.g. require ID for auto) if ops cost of wrongs dominates — not from this train slice alone
+
+
 
 ### 2026-10-14 — Remove alias confidence floor (`alias_low_trust`)
 
@@ -399,7 +412,7 @@ Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refres
 
 ### 2026-10-14 — OLD alias + text-candidate confirm (`alias_old_successor`)
 
-**Evidence (`train_smoke_trust allias.csv`):** 29 `abstain_miss` with buyer_sku — all OLD-only fallthrough. Strip `-OLD` == GT for all 29. Gate “live code ∈ text candidates” → **16** would auto correctly, **0** FP; **13** stay review (text never ranked the live code).
+**Evidence (**`train_smoke_trust allias.csv`**):** 29 `abstain_miss` with buyer_sku — all OLD-only fallthrough. Strip `-OLD` == GT for all 29. Gate “live code ∈ text candidates” → **16** would auto correctly, **0** FP; **13** stay review (text never ranked the live code).
 
 **Change:** Alias lane emits `pending_text_confirm` when only `*-OLD` maps and a unique active sibling exists. Service autos `alias_old_successor` only if that code is in text retrieval candidates; else unchanged text decide. D-03 → (d).
 
@@ -419,33 +432,98 @@ Twins/Cadbury/brandless Cable Tie tests still green (41 tests). Debug CSV refres
 
 **Current train vs holdout** (same matcher; train labelled, holdout unlabelled — no precision on holdout):
 
-| | train (`order_lines_train.csv`) | holdout (`predictions.csv`) |
-|---|---|---|
-| lines | 420 | 300 |
-| auto | 239 | 160 |
-| review | 132 | 103 |
-| reject | 49 | 37 |
-| coverage (auto share) | **56.9%** | **53.3%** |
-| auto_correct / auto_wrong | 221 / 18 | n/a (no labels) |
-| precision on auto | **0.925** | n/a |
-| net value (train only) | **−17220** | n/a |
+
+|                           | train (`order_lines_train.csv`) | holdout (`predictions.csv`) |
+| ------------------------- | ------------------------------- | --------------------------- |
+| lines                     | 420                             | 300                         |
+| auto                      | 239                             | 160                         |
+| review                    | 132                             | 103                         |
+| reject                    | 49                              | 37                          |
+| coverage (auto share)     | **56.9%**                       | **53.3%**                   |
+| auto_correct / auto_wrong | 221 / 18                        | n/a (no labels)             |
+| precision on auto         | **0.925**                       | n/a                         |
+| net value (train only)    | **−17220**                      | n/a                         |
+
 
 **Reason mix (counts):**
 
-| reason | train | holdout |
-|---|---|---|
-| lexical_unique | 169 | 109 |
-| ambiguous_twins | 73 | 70 |
-| alias_exact | 23 | 14 |
-| alias_old_successor | 35 | 24 |
-| barcode_hit | 12 | 13 |
-| brand_not_in_tenant | 45 | 34 |
-| no_candidate_above_floor | 40 | 20 |
-| ambiguous_margin | 18 | 13 |
-| not_an_item | 4 | 3 |
-| ambiguous_barcode | 1 | 0 |
+
+| reason                   | train | holdout |
+| ------------------------ | ----- | ------- |
+| lexical_unique           | 169   | 109     |
+| ambiguous_twins          | 73    | 70      |
+| alias_exact              | 23    | 14      |
+| alias_old_successor      | 35    | 24      |
+| barcode_hit              | 12    | 13      |
+| brand_not_in_tenant      | 45    | 34      |
+| no_candidate_above_floor | 40    | 20      |
+| ambiguous_margin         | 18    | 13      |
+| not_an_item              | 4     | 3       |
+| ambiguous_barcode        | 1     | 0       |
+
 
 Coverage is close (train a bit higher — more alias history on train customers). Holdout reason shape tracks train; no holdout labels so do not invent precision. Re-run: `python scripts/run_train_smoke.py` / `python scripts/run_holdout.py`.
+
+### 2026-10-15/16 — Task 3 noise classes → eval harness
+
+**Brief ask:** one-command harness on `order_lines_train.csv`; print metrics with **per-tenant** and **per-noise-class** breakdowns. Classes are not labelled → define own segmentation and justify.
+
+#### What “noise class” is (and is not)
+
+- **Not** `reason_code`. That is *why the matcher stopped* (`lexical_unique`, `ambiguous_twins`, …). Bucket by it and classes move when you change thresholds — circular.
+- **Is** *line shape / input population*: what kind of mess (or signal) is on the row, assigned from raw fields + catalogue shape, independent of the decision path.
+- Discovery workflow: run matcher → stare at failures + raw text → name clusters → turn clusters into **deterministic rules** → spot-check. Do not hand-label 420 rows forever.
+
+Also clarified outcome math for EVAL: `abstain_ok` = refuse correct (blank GT), **not** auto. Wrong refuse = `abstain_miss` (−40), **not** `auto_wrong` (−800). Only a wrong auto is the expensive failure.
+
+#### Nine primary classes (priority, first match wins)
+
+Locked taxonomy in `matcher/input_class.py`:
+
+
+| #   | Class                   | Intent                                                                          |
+| --- | ----------------------- | ------------------------------------------------------------------------------- |
+| 1   | `non_item`              | Junk / chat crumbs / empty (`same as last`, `subtotal`, `pls confirm stock`, …) |
+| 2   | `id_barcode`            | `raw_barcode` present (signal channel, not “noise”)                             |
+| 3   | `id_alias`              | `buyer_sku` present                                                             |
+| 4   | `foreign_brand`         | Brand-shaped leading token not in tenant catalogue (Cadbury, Makita, …)         |
+| 5   | `conversational_prefix` | Chat wrapper (`need`, `urgent`, `pls`, `item:`, `-`, `1)`)                      |
+| 6   | `typo_or_abbrev`        | Known abbrev/Malay/typo markers + leading-brand fuzzy typo                      |
+| 7   | `pack_uom_underspec`    | Pack qty `xN`, pack-like `uom_text`, bulk, or twin attr underspec               |
+| 8   | `brandless_clean`       | No catalogue brand; product-word lead (e.g. Cable Tie)                          |
+| 9   | `clean_named`           | Default: catalogue brand hit, otherwise clean                                   |
+
+
+Dropped `blank_gt` as a primary class / tag after trying it — redundant with `gt_item_code` empty and the outcome already splits abstain_ok vs auto_wrong. Kept as analysis note in EVAL, not a harness axis.
+
+#### Build sequence
+
+1. **First pass classifier** — hand lists + twin shortlist; wired into `run_train_smoke.py`.
+2. **Audit vs** `train_smoke.csv` — tagging was loose; **lanes looked fine** (barcode→`barcode_hit`, Cadbury→`brand_not_in_tenant`). Bad buckets were classifier rules, not matcher bugs.
+3. **Bug fixes kept (partial rewrite, not full data-driven redo):**
+  - Class-glue regex was matching normal `25mm Class C` → tighten to broken `mmC lass` / `mmclass` only.
+  - Brand fuzzy: `white`≈`Hitex` was tagging `Cable White` as typo → only count fuzzy when **leading** token is the brand match.
+  - Expand `non_item` for chat crumbs; add `pls` / `1)` to conversational; add `packet` to pack UOMs.
+4. **Harness** — `scripts/run_train_smoke.py`:
+  - Prints overall (P on auto, coverage, misleading accuracy, net, recall@3 on abstain_miss, cross-tenant, latency) + per-tenant + per-noise-class.
+  - Writes **one pair** per run: `train_smoke_<stamp>.csv` + `train_metrics_<stamp>.csv` (no “latest” duplicate copies).
+  - Sequential integer column `id` (1, 2, …) inside both files; stamp stays in the filename.
+5. **Tests** — `tests/test_input_class.py` for the buckets that previously misfired.
+
+
+
+#### What the breakdown taught (after fixes)
+
+Rough shape on train: ID lanes (`id_barcode` / `id_alias`) near P=1 / high cov; `foreign_brand` almost all abstain; `pack_uom_underspec` and `clean_named` hold most residual FPs; `typo_or_abbrev` is small after tightening (hand list still misses typos under conversational prefixes — priority steals them). All 18 `auto_wrong` still live on blank-GT exact lexical hits (label/policy, not a noise-class fix).
+
+#### Still imperfect (document, don’t over-engineer)
+
+- Conversational as **primary** means typo-under-prefix never lands in `typo_or_abbrev`.
+- `pack_uom_underspec` still uses phrase shortlist / twin disagreement → partly overlaps matcher twin logic (acceptable for v1; note in EVAL).
+- `foreign_brand` also catches out-of-tenant *products* (Copper pipe) — bucket name is slightly wider than “brand”; justify as wrong-world / out-of-catalogue lead token.
+- Separate lane note (not fixed in this slice): `detect_brand` fuzzes early tokens so colours can soft-restrict brand — classifier now ignores non-leading fuzzy; text lane still has the behaviour.
+
+**Commands:** `python scripts/run_train_smoke.py` · numbers / curve live in `EVAL.md` + `scripts/sweep_operating_point.py`.
 
 ---
 

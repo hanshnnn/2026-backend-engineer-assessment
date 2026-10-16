@@ -13,7 +13,6 @@ Also writes one pair of CSVs per run under submission/debug/:
   train_smoke_<YYYYMMDD_HHMMSS>.csv    — row-level detail
   train_metrics_<YYYYMMDD_HHMMSS>.csv  — overall / tenant / noise-class slices
 
-Both files share a sequential integer column ``id`` (1, 2, 3, …).
 """
 
 from __future__ import annotations
@@ -62,25 +61,6 @@ METRICS_FIELDS = [
 V_CORRECT = 20
 V_ABSTAIN = -40
 V_WRONG = -800
-
-
-def _next_id(out_dir: Path) -> int:
-    """Next sequential run id from the ``id`` column in existing metrics CSVs."""
-    best = 0
-    if not out_dir.is_dir():
-        return 1
-    for path in out_dir.glob("train_metrics_*.csv"):
-        try:
-            with path.open(newline="", encoding="utf-8") as fh:
-                reader = csv.DictReader(fh)
-                for row in reader:
-                    raw = (row.get("id") or row.get("run_id") or "").strip()
-                    if raw.isdigit():
-                        best = max(best, int(raw))
-                    break  # one value per file
-        except OSError:
-            continue
-    return best + 1
 
 
 def _outcome(decision: str, pred: str, gt: str) -> str:
