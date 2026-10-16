@@ -186,6 +186,7 @@ Use when building / editing DESIGN later:
 | 2026-10-14 brand soft     | Drop denylist/`_PRODUCT_START`; catalogue exact+fuzzy; foreign=weak item    |
 | 2026-10-14 item phrase    | Catalogue leaf + brand-stripped name shortlist before attrs                 |
 | 2026-10-14 alias floor    | Drop 0.55/`alias_low_trust` gate — unique alias autos; train-only evidence  |
+| 2026-10-16 Task 5 INV1/2  | Pull cursor drain ties; stable idempotency key + conflict adopt-if-same     |
 
 
 ---
@@ -524,6 +525,41 @@ Rough shape on train: ID lanes (`id_barcode` / `id_alias`) near P=1 / high cov; 
 - Separate lane note (not fixed in this slice): `detect_brand` fuzzes early tokens so colours can soft-restrict brand — classifier now ignores non-leading fuzzy; text lane still has the behaviour.
 
 **Commands:** `python scripts/run_train_smoke.py` · numbers / curve live in `EVAL.md` + `scripts/sweep_operating_point.py`.
+
+### 2026-10-16 — Task 5 sync: INV1 + INV2 fixes
+
+Working in `starter/sync/`. Symptom reporter: `python run_sync.py`. Do **not** patch `fake_erp.py` (vendor semantics).
+
+#### INV1 / MAIA-812 — missing records on first pull
+
+**Symptom:** First `pull` already short one row (`EXT-0050`); INV1 `missing locally`.
+
+**Mechanism:** `list_changes` is `updated_at > since` at **second** resolution; ties are common (`seed_records` often `tick(0)`). Adapter set cursor to `page[-1].updated_at` after every page → siblings with the **same** timestamp after the page boundary never appear again (until someone edits them → new ts).
+
+**Fix (in `pull`):** On a full page, only advance the cursor past timestamps you have fully drained — set cursor to the last row with `updated_at < page[-1].updated_at` (re-upsert of that bucket is fine). Short page → park on `page[-1].updated_at` and stop. If the whole page shares one second, fall back to `last_ts` (ties ≪ `page_size` in this ERP).
+
+**Invariant:** After a full pull, every remote record exists locally at the remote version (no silent skips from timestamp-tied pagination).
+
+#### INV2 / MAIA-830 — one edit → two ERP writes
+
+**Symptom:** `EXT-0042` appears twice in `write_log` with `price=999` (`v2` then `v3`).
+
+**Mechanism (stacked):**
+
+1. ERP `write` **commits then** may raise `ErpTimeout` (504).
+2. `idempotency_key` included `attempt` + `time.time()` → retry used a **new** key → ERP idempotency (exact match, 60s) never fired.
+3. Retry with stale `base_version` → 409 → conflict handler wrote again → second version of the same payload.
+
+**Fix (in `idempotency_key` + `push`):**
+
+- Key = hash`(external_id, payload)` only — stable per logical edit; one key for the whole retry loop.
+- On `ErpConflict`, if `current.payload == rec.payload` → adopt remote version / clear dirty (504-after-commit); do **not** write again.
+
+**Invariant:** One local dirty edit → at most one new ERP version (retries only re-ack the same idempotent write).
+
+**Left open:** INV3 / MAIA-844 — conflict path still overwrites a *different* remote payload (e.g. ERP set `uom=Box` while we push old local edit). Separate defect.
+
+**Verify:** `cd starter/sync && python run_sync.py` → INV1/INV2 clean; INV3 still fails.
 
 ---
 

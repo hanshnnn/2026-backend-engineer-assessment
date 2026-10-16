@@ -48,9 +48,10 @@ def now_utc() -> str:
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
 
 
-def idempotency_key(external_id: str, payload: dict, attempt: int) -> str:
-    blob = json.dumps({"id": external_id, "payload": payload,
-                       "attempt": attempt, "at": time.time()}, sort_keys=True)
+def idempotency_key(external_id: str, payload: dict) -> str:
+    # Stable per logical edit so a 504-after-commit retry reuses the ERP cache
+    # instead of creating a second write.
+    blob = json.dumps({"id": external_id, "payload": payload}, sort_keys=True)
     return hashlib.sha256(blob.encode()).hexdigest()[:32]
 
 
@@ -95,20 +96,23 @@ def push(erp: FakeErp, store: LocalStore, max_attempts: int = 3) -> int:
     for rec in list(store.records.values()):
         if not rec.dirty:
             continue
-        for attempt in range(max_attempts):
+        key = idempotency_key(rec.external_id, rec.payload)
+        for _attempt in range(max_attempts):
             try:
                 remote = erp.write(rec.external_id, rec.payload,
                                    base_version=rec.remote_version,
-                                   idempotency_key=idempotency_key(
-                                       rec.external_id, rec.payload, attempt))
+                                   idempotency_key=key)
             except ErpTimeout:
-                continue                      # transient - try again
+                continue                      # may already be committed - retry same key
             except ErpConflict:
                 current = erp.get(rec.external_id)
-                remote = erp.write(rec.external_id, rec.payload,
-                                   base_version=current.version,
-                                   idempotency_key=idempotency_key(
-                                       rec.external_id, rec.payload, attempt))
+                if current and current.payload == rec.payload:
+                    # Our write landed (e.g. 504 after commit); don't write again.
+                    remote = current
+                else:
+                    remote = erp.write(rec.external_id, rec.payload,
+                                       base_version=current.version,
+                                       idempotency_key=key)
             rec.remote_version = remote.version
             rec.updated_at_utc = remote.updated_at
             rec.dirty = False
