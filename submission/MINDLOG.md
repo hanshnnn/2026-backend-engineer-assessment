@@ -186,7 +186,7 @@ Use when building / editing DESIGN later:
 | 2026-10-14 brand soft     | Drop denylist/`_PRODUCT_START`; catalogue exact+fuzzy; foreign=weak item    |
 | 2026-10-14 item phrase    | Catalogue leaf + brand-stripped name shortlist before attrs                 |
 | 2026-10-14 alias floor    | Drop 0.55/`alias_low_trust` gate — unique alias autos; train-only evidence  |
-| 2026-10-16 Task 5 INV1/2  | Pull cursor drain ties; stable idempotency key + conflict adopt-if-same     |
+| 2026-10-16 Task 5 INV1–3  | Cursor drain ties; stable idem key; 409 different-payload → adopt remote    |
 
 
 ---
@@ -526,40 +526,52 @@ Rough shape on train: ID lanes (`id_barcode` / `id_alias`) near P=1 / high cov; 
 
 **Commands:** `python scripts/run_train_smoke.py` · numbers / curve live in `EVAL.md` + `scripts/sweep_operating_point.py`.
 
-### 2026-10-16 — Task 5 sync: INV1 + INV2 fixes
+### 2026-10-16 — Task 5 sync: INV1 + INV2 + INV3
 
 Working in `starter/sync/`. Symptom reporter: `python run_sync.py`. Do **not** patch `fake_erp.py` (vendor semantics).
+
+#### Assessment cheat-sheet (how to say it)
+
+1. **INV1 — wording to keep precise:**  
+   Not “end-of-page `updated_at` equals `since` so that row is skipped.”  
+   We *do* ingest the page, then set `cursor = page[-1].updated_at`. Next call asks `updated_at > cursor`. Any **other** rows that share that same second but sorted *after* the page cut (e.g. `EXT-0050` after `EXT-0049`) are never returned → neglected forever until edited.
+
+2. **INV2:** Idempotency key hashed `attempt` + `at` (`time.time()`). After **504-after-commit**, retry bumped attempt/time → **different key** → ERP treated it as a new write; stale `base_version` → 409 → conflict handler wrote again → duplicate.
+
+3. **INV3 / what is 409?**  
+   `ErpConflict` = HTTP-style **409**: your `base_version` ≠ current remote version. Someone (or your own timed-out commit) already moved the row.  
+   Fix: if remote payload **differs**, do **not** force-write — adopt ERP copy, clear dirty.  
+   **Does this break normal local → ERP push?** No. Happy path is `write(base_version=rec.remote_version)` with matching version → **no 409** → unchanged. INV3 only changes the conflict branch.
 
 #### INV1 / MAIA-812 — missing records on first pull
 
 **Symptom:** First `pull` already short one row (`EXT-0050`); INV1 `missing locally`.
 
-**Mechanism:** `list_changes` is `updated_at > since` at **second** resolution; ties are common (`seed_records` often `tick(0)`). Adapter set cursor to `page[-1].updated_at` after every page → siblings with the **same** timestamp after the page boundary never appear again (until someone edits them → new ts).
+**Mechanism:** `list_changes` is `updated_at > since` at **second** resolution; ties are common. Cursor parked on last page timestamp → same-second siblings past the page boundary skipped forever.
 
-**Fix (in `pull`):** On a full page, only advance the cursor past timestamps you have fully drained — set cursor to the last row with `updated_at < page[-1].updated_at` (re-upsert of that bucket is fine). Short page → park on `page[-1].updated_at` and stop. If the whole page shares one second, fall back to `last_ts` (ties ≪ `page_size` in this ERP).
+**Fix (in `pull`):** On a full page, set cursor to last row with `updated_at < page[-1].updated_at` (re-read incomplete bucket). Short page → park on last ts and stop.
 
-**Invariant:** After a full pull, every remote record exists locally at the remote version (no silent skips from timestamp-tied pagination).
+**Invariant:** Full pull → every remote record local at remote version.
 
 #### INV2 / MAIA-830 — one edit → two ERP writes
 
-**Symptom:** `EXT-0042` appears twice in `write_log` with `price=999` (`v2` then `v3`).
+**Symptom:** `EXT-0042` twice in `write_log` with `price=999`.
 
-**Mechanism (stacked):**
+**Fix:** Stable key = hash`(id, payload)` only; one key per retry loop. On 409 with **same** payload → adopt (504-after-commit), don’t rewrite.
 
-1. ERP `write` **commits then** may raise `ErpTimeout` (504).
-2. `idempotency_key` included `attempt` + `time.time()` → retry used a **new** key → ERP idempotency (exact match, 60s) never fired.
-3. Retry with stale `base_version` → 409 → conflict handler wrote again → second version of the same payload.
+**Invariant:** One dirty edit → at most one new ERP version.
 
-**Fix (in `idempotency_key` + `push`):**
+#### INV3 / MAIA-844 — remote edit clobbered
 
-- Key = hash`(external_id, payload)` only — stable per logical edit; one key for the whole retry loop.
-- On `ErpConflict`, if `current.payload == rec.payload` → adopt remote version / clear dirty (504-after-commit); do **not** write again.
+**Symptom:** ERP set `EXT-0011` `uom=Box`; after push remote is `{price:999, uom:Nos}`.
 
-**Invariant:** One local dirty edit → at most one new ERP version (retries only re-ack the same idempotent write).
+**Mechanism:** Local dirty push with `base_version=1` while ERP already at `v2` with different payload → **409** → old handler force-wrote local over remote.
 
-**Left open:** INV3 / MAIA-844 — conflict path still overwrites a *different* remote payload (e.g. ERP set `uom=Box` while we push old local edit). Separate defect.
+**Fix:** On 409 with **different** payload → adopt remote (`payload` / version / ts), clear dirty. No second write.
 
-**Verify:** `cd starter/sync && python run_sync.py` → INV1/INV2 clean; INV3 still fails.
+**Invariant:** Concurrent remote edit is not silently lost. (Unpushed local edit dropped on conflict — no merge UI yet.)
+
+**Verify:** `cd starter/sync && python run_sync.py` → all three invariants hold.
 
 ---
 

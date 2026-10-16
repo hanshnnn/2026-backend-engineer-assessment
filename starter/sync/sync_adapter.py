@@ -110,9 +110,9 @@ def push(erp: FakeErp, store: LocalStore, max_attempts: int = 3) -> int:
                     # Our write landed (e.g. 504 after commit); don't write again.
                     remote = current
                 else:
-                    remote = erp.write(rec.external_id, rec.payload,
-                                       base_version=current.version,
-                                       idempotency_key=key)
+                    # Concurrent remote edit — do not clobber it.
+                    remote = current
+                    rec.payload = dict(remote.payload)
             rec.remote_version = remote.version
             rec.updated_at_utc = remote.updated_at
             rec.dirty = False
